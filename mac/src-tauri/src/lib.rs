@@ -469,20 +469,20 @@ pub fn run() {
 
     tauri::Builder::default()
         .manage(state)
-        .plugin(
-            tauri_plugin_global_shortcut::Builder::new()
-                .with_handler(|app, shortcut, event| {
-                    if event.state == tauri_plugin_global_shortcut::ShortcutState::Pressed {
-                        log::info!("全局快捷键触发: {}", shortcut);
-                        trigger_send(app);
-                    }
-                })
-                .build(),
-        )
         .plugin(tauri_plugin_notification::init())
         .setup(move |app| {
-            // 注册快捷键（从设置加载）
+            // 注册全局快捷键插件（必须在 setup 内通过 handle 注册，避免 config 反序列化问题）
             use tauri_plugin_global_shortcut::GlobalShortcutExt;
+            app.handle().plugin(
+                tauri_plugin_global_shortcut::Builder::new()
+                    .with_handler(|app, shortcut, event| {
+                        if event.state == tauri_plugin_global_shortcut::ShortcutState::Pressed {
+                            log::info!("全局快捷键触发: {}", shortcut);
+                            trigger_send(app);
+                        }
+                    })
+                    .build(),
+            )?;
             app.global_shortcut().register(initial_hotkey.as_str())?;
             log::info!("已注册全局快捷键: {}", initial_hotkey);
 
