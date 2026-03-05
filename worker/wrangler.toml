@@ -1,0 +1,10 @@
+name = "ghostclip-worker"
+main = "src/index.ts"
+compatibility_date = "2025-03-01"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "PLACEHOLDER_KV_ID"
+
+# For local dev, wrangler will use local KV storage automatically.
+# Production KV namespace ID should be set after `wrangler kv namespace create GHOSTCLIP_KV`.

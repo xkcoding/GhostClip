@@ -1,4 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GhostClip Spike</string>
+    <string name="app_name">GhostClip</string>
+
+    <!-- Main Screen -->
+    <string name="status_connected">已连接</string>
+    <string name="status_cloud">云端同步</string>
+    <string name="status_disconnected">未连接</string>
+    <string name="status_searching">搜索中…</string>
+    <string name="recent_syncs">最近同步</string>
+    <string name="today_count">今日 %d 条</string>
+    <string name="no_syncs">暂无同步记录</string>
+    <string name="no_syncs_hint">发送或接收剪贴板内容后会显示在这里</string>
+    <string name="from_device">来自 %s</string>
+    <string name="send_to_device">发送到 %s</string>
+
+    <!-- Time Ago -->
+    <string name="time_just_now">刚刚</string>
+    <string name="time_seconds_ago">%d 秒前</string>
+    <string name="time_minutes_ago">%d 分钟前</string>
+    <string name="time_hours_ago">%d 小时前</string>
+
+    <!-- Settings Screen -->
+    <string name="settings">设置</string>
+    <string name="cloud_sync">云端同步</string>
+    <string name="cloud_url">云端地址</string>
+    <string name="cloud_url_hint">ghostclip.xkcoding.com</string>
+    <string name="cloud_token">Token</string>
+    <string name="cloud_token_hint">输入 Token</string>
+    <string name="cloud_enabled">启用云端同步</string>
+    <string name="permissions_title">权限状态</string>
+    <string name="battery_optimization">电池优化</string>
+    <string name="status_enabled">已启用</string>
+    <string name="status_not_disabled">未关闭</string>
+    <string name="about">关于</string>
+    <string name="version">版本</string>
+    <string name="version_value">0.1.0 (MVP)</string>
+    <string name="source_code">源代码</string>
+    <string name="github">GitHub</string>
+    <string name="saved">已保存</string>
+
+    <!-- Battery Guide -->
+    <string name="battery_guide_step_label">步骤 2/2</string>
+    <string name="battery_guide_title">关闭电池优化</string>
+    <string name="battery_guide_desc">为确保 GhostClip 在后台稳定运行，需要将应用排除在系统电池优化之外。否则系统可能在省电时关闭同步服务。</string>
+    <string name="battery_guide_step1">打开系统「设置」→「电池」</string>
+    <string name="battery_guide_step2">找到「GhostClip」→「无限制」</string>
+    <string name="battery_guide_cta">前往电池设置</string>
+    <string name="battery_guide_skip">稍后再说</string>
+    <string name="battery_guide_open_fail">无法打开设置</string>
+
+    <!-- Notification -->
+    <string name="notif_channel_name">GhostClip 同步服务</string>
+    <string name="notif_running">GhostClip 运行中</string>
+    <string name="notif_connected_lan">已连接 %s (局域网)</string>
+    <string name="notif_connected_cloud">云端同步中</string>
+    <string name="notif_disconnected">未连接到 Mac</string>
+    <string name="notif_pause">暂停同步</string>
+    <string name="notif_disconnect">断开连接</string>
 </resources>

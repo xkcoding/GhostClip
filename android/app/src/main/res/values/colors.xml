@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- GhostClip Design System Colors -->
+    <color name="accent">#22C55E</color>
+    <color name="accent_dark">#16A34A</color>
+    <color name="accent_light">#F0FDF4</color>
+    <color name="bg_primary">#FFFFFF</color>
+    <color name="bg_secondary">#FAFAFA</color>
+    <color name="bg_tertiary">#F4F4F5</color>
+    <color name="border">#E4E4E7</color>
+    <color name="error">#EF4444</color>
+    <color name="warning">#F59E0B</color>
+    <color name="warning_light">#FEF3C7</color>
+    <color name="warning_dark">#92400E</color>
+    <color name="text_on_accent">#FFFFFF</color>
+    <color name="text_primary">#18181B</color>
+    <color name="text_secondary">#71717A</color>
+    <color name="text_tertiary">#A1A1AA</color>
+</resources>

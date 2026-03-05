@@ -3,23 +3,63 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Material3.Light.NoActionBar"
+        android:theme="@style/Theme.GhostClip"
         tools:targetApi="35">
 
+        <!-- 主界面 -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 快速同步透明 Activity（悬浮球/快捷方式触发） -->
+        <activity
+            android:name=".ui.QuickSyncActivity"
+            android:exported="true"
+            android:theme="@style/Theme.GhostClip.Transparent"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="com.xkcoding.ghostclip.QUICK_SYNC" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- 电池优化引导 -->
+        <activity
+            android:name=".ui.BatteryGuideActivity"
+            android:exported="false" />
+
+        <!-- 设置界面 -->
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:exported="false" />
+
+        <!-- 前台 Service -->
+        <service
+            android:name=".service.GhostClipService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="clipboard_sync" />
+        </service>
 
     </application>
 

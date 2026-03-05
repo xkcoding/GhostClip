@@ -1,0 +1,589 @@
+/* ============================================
+   GhostClip Mac UI — Design System
+   Fonts: Space Grotesk (headings), Inter (body)
+   Accent: #22C55E
+   ============================================ */
+
+/* CSS Variables (from .pen design tokens) */
+:root {
+  --accent: #22C55E;
+  --accent-dark: #16A34A;
+  --accent-light: #F0FDF4;
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #FAFAFA;
+  --bg-tertiary: #F4F4F5;
+  --border: #E4E4E7;
+  --error: #EF4444;
+  --warning: #F59E0B;
+  --text-on-accent: #FFFFFF;
+  --text-primary: #18181B;
+  --text-secondary: #71717A;
+  --text-tertiary: #A1A1AA;
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: transparent;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* ============================================
+   Dropdown Panel (Menu Bar Popup)
+   ============================================ */
+#dropdown-view {
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  background: #E8E8E8;
+}
+
+.dropdown-panel {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.dd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  flex-shrink: 0;
+}
+
+.dd-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dd-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.dd-dot.disconnected {
+  background: var(--error);
+}
+
+.dd-dot.cloud {
+  background: var(--warning);
+}
+
+.dd-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dd-status {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.dd-status.disconnected {
+  color: var(--error);
+}
+
+.dd-status.cloud {
+  color: var(--warning);
+}
+
+/* Divider */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* Device Info */
+.dev-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  flex-shrink: 0;
+}
+
+.dev-row,
+.conn-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dev-row .icon,
+.conn-row .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.conn-row .icon {
+  color: var(--accent);
+}
+
+.conn-row .icon.cloud {
+  color: var(--warning);
+}
+
+.dev-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.conn-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Recent Sync Section */
+.recent-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 16px 4px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  text-transform: none;
+  padding-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.recent-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.recent-row:hover {
+  background: var(--bg-tertiary);
+}
+
+.recent-row .icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.recent-row .icon.incoming {
+  color: var(--accent);
+}
+
+.recent-row .icon.outgoing {
+  color: var(--warning);
+}
+
+.recent-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recent-time {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+/* Empty state */
+.recent-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 16px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.recent-empty .icon {
+  width: 24px;
+  height: 24px;
+  color: var(--text-tertiary);
+  opacity: 0.5;
+}
+
+/* Action Section */
+.action-section {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: default;
+}
+
+.action-row:hover {
+  background: var(--bg-tertiary);
+}
+
+.action-row .icon {
+  width: 14px;
+  height: 14px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.action-row .text {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.action-row .shortcut {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+
+.action-row.quit .icon {
+  color: var(--error);
+}
+
+/* ============================================
+   Settings Window
+   ============================================ */
+#settings-view {
+  display: none;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  flex-direction: column;
+}
+
+#settings-view.active {
+  display: flex;
+}
+
+/* Title Bar */
+.title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 16px;
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+
+.traffic-lights {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  -webkit-app-region: no-drag;
+}
+
+.traffic-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.traffic-light.red { background: #FF5F57; }
+.traffic-light.yellow { background: #FEBC2E; }
+.traffic-light.green { background: #28C840; }
+
+.traffic-light:hover {
+  filter: brightness(0.9);
+}
+
+.win-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.win-spacer {
+  width: 60px;
+}
+
+.title-bar-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* Settings Body */
+.settings-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Settings Section */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-section.cloud {
+  gap: 14px;
+}
+
+.settings-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+/* Hotkey Row */
+.key-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.key-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.key-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.key-badge:hover {
+  background: var(--border);
+}
+
+.key-badge.recording {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+
+.key-badge .key-val {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.key-badge.recording .key-val {
+  color: var(--accent);
+}
+
+/* Cloud Section Fields */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.field-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.field-input:focus {
+  border-color: var(--accent);
+}
+
+.field-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Toggle */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.toggle-track {
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.toggle-track.active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.toggle-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.toggle-track.active .toggle-thumb {
+  transform: translateX(18px);
+}
+
+/* Notification Description */
+.toggle-desc {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+/* Settings Section Divider */
+.settings-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ============================================
+   Error Toast
+   ============================================ */
+.error-toast {
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.error-toast.warning {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.error-toast.error {
+  background: #FEF2F2;
+  color: #991B1B;
+}
+
+.error-toast-text {
+  display: block;
+  word-break: break-word;
+}
+
+/* Persistent Connection Error Banner */
+.conn-error {
+  padding: 8px 16px;
+  background: #FEF2F2;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #991B1B;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Settings Validation Error */
+.settings-error {
+  padding: 8px 12px;
+  margin-top: 8px;
+  background: #FEF2F2;
+  border: 1px solid var(--error);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #991B1B;
+}
+
+/* ============================================
+   Lucide Icon Inline SVGs
+   ============================================ */
+.icon svg {
+  width: 100%;
+  height: 100%;
+}
