@@ -16,4 +16,7 @@
     <color name="text_primary">#18181B</color>
     <color name="text_secondary">#71717A</color>
     <color name="text_tertiary">#A1A1AA</color>
+
+    <!-- Adaptive Icon Background -->
+    <color name="ic_launcher_background">#86CFAC</color>
 </resources>
