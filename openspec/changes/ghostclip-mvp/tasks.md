@@ -1,8 +1,13 @@
 ## 0. Phase 0: 技术 Spike 验证
 
-- [ ] 0.1 创建最小 Android 项目，注册 AccessibilityService，验证能否检测到其他 App 的复制事件（Android 16 + HyperOS 3.0）
-- [ ] 0.2 实现透明 Activity（0dp x 0dp）闪现读取 ClipboardManager，验证能否在后台成功获取剪贴板文本
-- [ ] 0.3 如果 0.1/0.2 失败，验证 Plan B（NotificationListenerService 拦截短信验证码）或 Plan C（轻量 IME）的可行性
+- [x] 0.1 创建最小 Android 项目，注册 AccessibilityService，验证能否检测到其他 App 的复制事件（Android 16 + HyperOS 3.0）
+  - **结果: 失败**。AccessibilityService 事件文本匹配（"复制"/"copy"）在 HyperOS 3.0 上不触发；ClipboardManager.addPrimaryClipChangedListener() 在后台同样无法触发回调
+- [x] 0.2 实现透明 Activity（0dp x 0dp）闪现读取 ClipboardManager，验证能否在后台成功获取剪贴板文本
+  - **结果: 部分成功**。透明 Activity 本身可以读取剪贴板，但由 AccessibilityService 后台启动时不触发（因为 0.1 的监听不触发）；前台 onResume 时直接读取 ClipboardManager 100% 成功
+- [x] 0.3 降级方案验证
+  - **结论: 采用 Plan D — 悬浮球手动触发**。用户复制文字后，点击小米悬浮球打开 App，App 在 onResume 自动读取剪贴板内容。多一步点击但 100% 可靠
+  - Plan B (NotificationListener) / Plan C (IME) 暂不验证，悬浮球方案体验可接受
+  - **后续 MVP 设计**: 正常点击图标 → 进入主界面；悬浮球/快捷方式带 Intent Extra(auto_sync=true) → 读取+投递+自动退回
 - [ ] 0.4 创建最简 Cloudflare Worker，实现 POST /clip 写入 KV 和 GET /clip 读取 KV，用 curl 验证读写和 Token 校验
 - [ ] 0.5 初始化 Tauri v2 项目，实现 Menu Bar App 骨架，验证 NSPasteboard 读写和全局快捷键注册
 
@@ -37,13 +42,13 @@
 
 ## 4. Android 端原生应用 - 核心功能
 
-- [ ] 4.1 创建 Android 项目（Kotlin），配置 minSdk（API 29 / Android 10）
-- [ ] 4.2 实现 AccessibilityService 注册与配置（监听 TYPE_VIEW_TEXT_SELECTION_CHANGED 等事件）
-- [ ] 4.3 实现透明 Activity 闪现读取剪贴板（0dp x 0dp Activity，前台读取 ClipboardManager，立即 finish）
-- [ ] 4.4 实现连续复制事件的防抖合并（1s 内多次复制只处理最后一次）
+- [ ] 4.1 创建正式 Android 项目（Kotlin），配置 minSdk（API 29 / Android 10），基于 spike 代码重构
+- [ ] 4.2 实现主界面（设置、连接状态、最近同步记录）
+- [ ] 4.3 实现 QuickSyncActivity（透明 Activity，悬浮球/快捷方式触发 → 前台读取剪贴板 → 投递 → finish）
+- [ ] 4.4 实现启动方式区分（普通启动 → 主界面；Intent Extra auto_sync=true → QuickSyncActivity）
 - [ ] 4.5 实现 MD5 Hash 池（LRU，3 秒 TTL）用于去重
 - [ ] 4.6 实现 ClipboardManager 写入（接收远端数据时静默写入系统剪贴板）
-- [ ] 4.7 实现 Foreground Service + 常驻通知（START_STICKY 自动重启）
+- [ ] 4.7 实现 Foreground Service + 常驻通知（用于接收端推送场景）
 
 ## 5. Android 端原生应用 - 网络与同步
 
