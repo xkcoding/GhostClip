@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GhostClip Spike</string>
-    <string name="accessibility_service_description">GhostClip 需要此权限来监听复制事件，实现跨端剪贴板同步。</string>
 </resources>

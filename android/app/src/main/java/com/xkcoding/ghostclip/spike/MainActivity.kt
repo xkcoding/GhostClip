@@ -2,10 +2,10 @@ package com.xkcoding.ghostclip.spike
 
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
+import android.os.Handler
+import android.os.Looper
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var scrollView: ScrollView
     private val logBuilder = StringBuilder()
     private val timeFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
+    private val handler = Handler(Looper.getMainLooper())
     private var lastClipText: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,15 +72,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnLayout.addView(Button(this).apply {
-            text = "无障碍设置"
-            setOnClickListener {
-                startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-            }
-        })
-
-        btnLayout.addView(Button(this).apply {
             text = "手动读取"
-            setPadding(24, 0, 0, 0)
             setOnClickListener { readClipboard("手动触发") }
         })
         rootLayout.addView(btnLayout)
@@ -111,23 +104,21 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(rootLayout)
 
-        // 注册 SpikeEventBus 监听（保留，供后台检测成功时使用）
-        SpikeEventBus.register { message ->
-            appendLog(message)
-        }
-
         appendLog("App 启动")
     }
 
     override fun onResume() {
         super.onResume()
-        // 每次回到前台自动读取剪贴板
-        readClipboard("自动(onResume)")
+        // 延迟 200ms 读取，确保 window focus 完全建立（悬浮球唤起场景需要）
+        handler.postDelayed({ readClipboard("自动(onResume)") }, 200)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        SpikeEventBus.unregister()
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        // window focus 变化时也尝试读取（覆盖悬浮球等特殊唤起方式）
+        if (hasFocus) {
+            handler.postDelayed({ readClipboard("自动(onFocus)") }, 100)
+        }
     }
 
     private fun readClipboard(source: String) {
