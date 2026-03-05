@@ -8,39 +8,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  check:
-    name: Cargo Check & Test
-    runs-on: macos-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo registry & build
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            mac/src-tauri/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('mac/src-tauri/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
-
-      - name: Cargo check
-        working-directory: mac/src-tauri
-        run: cargo check --release 2>&1
-
-      - name: Cargo test
-        working-directory: mac/src-tauri
-        run: cargo test -- --test-threads=1
-
   build:
-    name: Build Tauri App
+    name: Check, Test & Build
     runs-on: macos-latest
-    needs: check
 
     steps:
       - uses: actions/checkout@v4
@@ -53,19 +23,24 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli --version "^2.0.0" --locked
-
-      - name: Cache cargo registry & build
+      - name: Cache cargo registry, build & bin
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
+            ~/.cargo/bin
             mac/src-tauri/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('mac/src-tauri/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
+
+      - name: Install Tauri CLI
+        run: command -v cargo-tauri >/dev/null 2>&1 || cargo install tauri-cli --version "^2.0.0" --locked
+
+      - name: Cargo test
+        working-directory: mac/src-tauri
+        run: cargo test -- --test-threads=1
 
       - name: Build Tauri app
         working-directory: mac
