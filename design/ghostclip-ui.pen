@@ -209,7 +209,8 @@
                       "fill": "$text-secondary",
                       "content": "局域网直连 · 延迟 2ms",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -248,7 +249,8 @@
                       "fill": "$text-tertiary",
                       "content": "今日 12 条",
                       "fontFamily": "Inter",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -328,7 +330,8 @@
                               "fill": "$text-tertiary",
                               "content": "10 秒前 · 来自 Android",
                               "fontFamily": "Inter",
-                              "fontSize": 13
+                              "fontSize": 13,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -404,7 +407,8 @@
                               "fill": "$text-tertiary",
                               "content": "2 分钟前 · 来自 Android",
                               "fontFamily": "Inter",
-                              "fontSize": 13
+                              "fontSize": 13,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -480,7 +484,8 @@
                               "fill": "$text-tertiary",
                               "content": "15 分钟前 · 发送到 Android",
                               "fontFamily": "Inter",
-                              "fontSize": 13
+                              "fontSize": 13,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -548,7 +553,8 @@
                               "fill": "$text-tertiary",
                               "content": "1 小时前 · 来自 Android",
                               "fontFamily": "Inter",
-                              "fontSize": 13
+                              "fontSize": 13,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -1121,7 +1127,8 @@
                           "fill": "$text-tertiary",
                           "content": "1.0.0 (MVP)",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -1169,7 +1176,8 @@
                               "fill": "$text-tertiary",
                               "content": "GitHub",
                               "fontFamily": "Inter",
-                              "fontSize": 14
+                              "fontSize": 14,
+                              "fontWeight": "normal"
                             },
                             {
                               "type": "icon_font",
@@ -1195,387 +1203,9 @@
     },
     {
       "type": "frame",
-      "id": "yyqrI",
-      "x": 1104,
-      "y": 0,
-      "name": "Android — Accessibility Guide",
-      "clip": true,
-      "width": 402,
-      "height": 874,
-      "fill": "$bg-primary",
-      "layout": "vertical",
-      "children": [
-        {
-          "type": "frame",
-          "id": "5W8Bt",
-          "name": "Status Bar",
-          "width": "fill_container",
-          "height": 62,
-          "padding": [
-            0,
-            24
-          ],
-          "justifyContent": "space_between",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "text",
-              "id": "aZn0a",
-              "name": "t3",
-              "fill": "$text-primary",
-              "content": "9:41",
-              "fontFamily": "Inter",
-              "fontSize": 16,
-              "fontWeight": "600"
-            },
-            {
-              "type": "frame",
-              "id": "zhoGD",
-              "name": "si3",
-              "gap": 6,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "gE5PN",
-                  "name": "sig3",
-                  "width": 16,
-                  "height": 16,
-                  "iconFontName": "signal",
-                  "iconFontFamily": "lucide",
-                  "fill": "$text-primary"
-                },
-                {
-                  "type": "icon_font",
-                  "id": "xwNOu",
-                  "name": "wif3",
-                  "width": 16,
-                  "height": 16,
-                  "iconFontName": "wifi",
-                  "iconFontFamily": "lucide",
-                  "fill": "$text-primary"
-                },
-                {
-                  "type": "icon_font",
-                  "id": "WyN5K",
-                  "name": "bat3",
-                  "width": 22,
-                  "height": 16,
-                  "iconFontName": "battery-full",
-                  "iconFontFamily": "lucide",
-                  "fill": "$text-primary"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "R5qJa",
-          "name": "Header",
-          "width": "fill_container",
-          "height": 56,
-          "padding": [
-            0,
-            24
-          ],
-          "justifyContent": "space_between",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "icon_font",
-              "id": "i2d7N",
-              "name": "closeBtn",
-              "width": 22,
-              "height": 22,
-              "iconFontName": "x",
-              "iconFontFamily": "lucide",
-              "fill": "$text-secondary"
-            },
-            {
-              "type": "text",
-              "id": "yDkrg",
-              "name": "stepLabel",
-              "fill": "$text-tertiary",
-              "content": "步骤 1/2",
-              "fontFamily": "Inter",
-              "fontSize": 14,
-              "fontWeight": "500"
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "1VSKf",
-          "name": "Guide Body",
-          "width": "fill_container",
-          "height": "fill_container",
-          "layout": "vertical",
-          "gap": 32,
-          "padding": [
-            24,
-            32,
-            32,
-            32
-          ],
-          "justifyContent": "center",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "frame",
-              "id": "vcjpR",
-              "name": "heroCircle",
-              "width": 120,
-              "height": 120,
-              "fill": "$accent-light",
-              "cornerRadius": 60,
-              "justifyContent": "center",
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "vWrd7",
-                  "name": "heroIcon",
-                  "width": 56,
-                  "height": 56,
-                  "iconFontName": "accessibility",
-                  "iconFontFamily": "lucide",
-                  "fill": "$accent"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "EMSEt",
-              "name": "textBlock",
-              "width": "fill_container",
-              "layout": "vertical",
-              "gap": 12,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "LLgDr",
-                  "name": "guideTitle",
-                  "fill": "$text-primary",
-                  "content": "启用无障碍服务",
-                  "textAlign": "center",
-                  "fontFamily": "Space Grotesk",
-                  "fontSize": 24,
-                  "fontWeight": "600",
-                  "letterSpacing": -0.5
-                },
-                {
-                  "type": "text",
-                  "id": "4ZUeh",
-                  "name": "guideDesc",
-                  "fill": "$text-secondary",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
-                  "content": "GhostClip 需要无障碍服务权限来监听复制事件，实现「复制即同步」的零点击体验。此权限仅用于检测剪贴板变化，不会读取其他应用数据。",
-                  "lineHeight": 1.5,
-                  "textAlign": "center",
-                  "fontFamily": "Inter",
-                  "fontSize": 15
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "gtmGC",
-              "name": "stepsFrame",
-              "width": "fill_container",
-              "layout": "vertical",
-              "gap": 16,
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "RCrkj",
-                  "name": "step1",
-                  "width": "fill_container",
-                  "gap": 12,
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "NsW2V",
-                      "name": "step1Num",
-                      "width": 28,
-                      "height": 28,
-                      "fill": "$accent",
-                      "cornerRadius": 14,
-                      "justifyContent": "center",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "FKJGA",
-                          "name": "step1NumT",
-                          "fill": "$text-on-accent",
-                          "content": "1",
-                          "fontFamily": "Inter",
-                          "fontSize": 13,
-                          "fontWeight": "600"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "text",
-                      "id": "917JX",
-                      "name": "step1Text",
-                      "fill": "$text-primary",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "打开系统「设置」→「无障碍」",
-                      "fontFamily": "Inter",
-                      "fontSize": 14
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "XmQpz",
-                  "name": "step2",
-                  "width": "fill_container",
-                  "gap": 12,
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "tLTrA",
-                      "name": "step2Num",
-                      "width": 28,
-                      "height": 28,
-                      "fill": "$accent",
-                      "cornerRadius": 14,
-                      "justifyContent": "center",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "7TjjA",
-                          "name": "step2NumT",
-                          "fill": "$text-on-accent",
-                          "content": "2",
-                          "fontFamily": "Inter",
-                          "fontSize": 13,
-                          "fontWeight": "600"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "text",
-                      "id": "ZuD3y",
-                      "name": "step2Text",
-                      "fill": "$text-primary",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "找到「GhostClip」并开启服务",
-                      "fontFamily": "Inter",
-                      "fontSize": 14
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "Gzhgo",
-                  "name": "step3",
-                  "width": "fill_container",
-                  "gap": 12,
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "IrIwK",
-                      "name": "step3Num",
-                      "width": 28,
-                      "height": 28,
-                      "fill": "$accent",
-                      "cornerRadius": 14,
-                      "justifyContent": "center",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "16eUT",
-                          "name": "step3NumT",
-                          "fill": "$text-on-accent",
-                          "content": "3",
-                          "fontFamily": "Inter",
-                          "fontSize": 13,
-                          "fontWeight": "600"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "text",
-                      "id": "SvNRi",
-                      "name": "step3Text",
-                      "fill": "$text-primary",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "在弹出的对话框中点击「允许」",
-                      "fontFamily": "Inter",
-                      "fontSize": 14
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "tY2yh",
-              "name": "ctaBtn",
-              "width": "fill_container",
-              "height": 52,
-              "fill": "$accent",
-              "cornerRadius": 16,
-              "gap": 8,
-              "justifyContent": "center",
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "LWoBN",
-                  "name": "ctaIcon",
-                  "width": 18,
-                  "height": 18,
-                  "iconFontName": "external-link",
-                  "iconFontFamily": "lucide",
-                  "fill": "$text-on-accent"
-                },
-                {
-                  "type": "text",
-                  "id": "3IrDh",
-                  "name": "ctaText",
-                  "fill": "$text-on-accent",
-                  "content": "前往系统设置",
-                  "fontFamily": "Inter",
-                  "fontSize": 16,
-                  "fontWeight": "600"
-                }
-              ]
-            },
-            {
-              "type": "text",
-              "id": "s2yiu",
-              "name": "skipBtn",
-              "fill": "$text-tertiary",
-              "content": "稍后再说",
-              "textAlign": "center",
-              "fontFamily": "Inter",
-              "fontSize": 14,
-              "fontWeight": "500"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "frame",
       "id": "m4Gqq",
-      "x": 1656,
-      "y": 0,
+      "x": 1128,
+      "y": 14,
       "name": "Android — Battery Guide",
       "clip": true,
       "width": 402,
@@ -1754,7 +1384,8 @@
                   "lineHeight": 1.5,
                   "textAlign": "center",
                   "fontFamily": "Inter",
-                  "fontSize": 15
+                  "fontSize": 15,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -1806,7 +1437,8 @@
                       "width": "fill_container",
                       "content": "打开系统「设置」→「电池」",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -1850,7 +1482,8 @@
                       "width": "fill_container",
                       "content": "找到「GhostClip」→「无限制」",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -1908,8 +1541,8 @@
     {
       "type": "frame",
       "id": "Cbf8r",
-      "x": 2208,
-      "y": 0,
+      "x": 1680,
+      "y": 14,
       "name": "Android — Notification",
       "clip": true,
       "width": 402,
@@ -1987,7 +1620,8 @@
                   "fill": "$text-tertiary",
                   "content": "现在",
                   "fontFamily": "Inter",
-                  "fontSize": 12
+                  "fontSize": 12,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -2008,7 +1642,8 @@
               "fill": "$text-secondary",
               "content": "已连接 MacBook Pro (局域网)",
               "fontFamily": "Inter",
-              "fontSize": 14
+              "fontSize": 14,
+              "fontWeight": "normal"
             },
             {
               "type": "frame",
@@ -2052,8 +1687,8 @@
     {
       "type": "frame",
       "id": "tEhTi",
-      "x": 2760,
-      "y": 0,
+      "x": 2232,
+      "y": 14,
       "name": "Mac — Menu Bar Dropdown",
       "clip": true,
       "width": 360,
@@ -2199,7 +1834,8 @@
                       "fill": "$text-secondary",
                       "content": "局域网直连 · 延迟 2ms",
                       "fontFamily": "Inter",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -2265,7 +1901,8 @@
                       "width": "fill_container",
                       "content": "验证码: 283941",
                       "fontFamily": "Inter",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -2274,7 +1911,8 @@
                       "fill": "$text-tertiary",
                       "content": "10s",
                       "fontFamily": "Inter",
-                      "fontSize": 11
+                      "fontSize": 11,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2307,7 +1945,8 @@
                       "width": "fill_container",
                       "content": "https://github.com/xkcoding/Gh…",
                       "fontFamily": "Inter",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -2316,7 +1955,8 @@
                       "fill": "$text-tertiary",
                       "content": "2m",
                       "fontFamily": "Inter",
-                      "fontSize": 11
+                      "fontSize": 11,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2349,7 +1989,8 @@
                       "width": "fill_container",
                       "content": "Hello World, this is a test.",
                       "fontFamily": "Inter",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -2358,7 +1999,8 @@
                       "fill": "$text-tertiary",
                       "content": "15m",
                       "fontFamily": "Inter",
-                      "fontSize": 11
+                      "fontSize": 11,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -2751,7 +2393,8 @@
                           "fill": "$text-primary",
                           "content": "ghostclip.xkcoding.com",
                           "fontFamily": "Inter",
-                          "fontSize": 13
+                          "fontSize": 13,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -2800,7 +2443,8 @@
                           "fill": "$text-primary",
                           "content": "••••••••••••••••",
                           "fontFamily": "Inter",
-                          "fontSize": 13
+                          "fontSize": 13,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -2929,11 +2573,39 @@
                   "content": "开启后，当接收到来自 Android 的剪贴板数据时会弹出系统通知。",
                   "lineHeight": 1.4,
                   "fontFamily": "Inter",
-                  "fontSize": 12
+                  "fontSize": 12,
+                  "fontWeight": "normal"
                 }
               ]
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "lzP7z",
+      "x": 3850,
+      "y": 0,
+      "name": "App Icon — Ghost with Envelope",
+      "width": 400,
+      "height": 400,
+      "fill": "#F0FDF4",
+      "cornerRadius": 40,
+      "children": [
+        {
+          "type": "frame",
+          "id": "9h1Lh",
+          "name": "Ghost Icon",
+          "width": 360,
+          "height": 360,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "./images/generated-1772739978355.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 20
         }
       ]
     }
