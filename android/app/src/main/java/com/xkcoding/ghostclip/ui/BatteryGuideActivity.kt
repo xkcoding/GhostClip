@@ -4,8 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.PowerManager
 import android.provider.Settings
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -42,11 +45,14 @@ class BatteryGuideActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // 如果用户从设置页面返回且已关闭电池优化, 自动关闭引导页
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
         if (pm.isIgnoringBatteryOptimizations(packageName)) {
+            // 显示成功提示，延迟 1.5 秒后自动关闭
+            findViewById<TextView>(R.id.text_success).visibility = View.VISIBLE
+            findViewById<LinearLayout>(R.id.btn_go_settings).visibility = View.GONE
+            findViewById<TextView>(R.id.btn_skip).visibility = View.GONE
             markDismissed()
-            finish()
+            Handler(Looper.getMainLooper()).postDelayed({ finish() }, 1500)
         }
     }
 

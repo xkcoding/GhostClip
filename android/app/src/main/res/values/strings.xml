@@ -40,12 +40,13 @@
     <string name="saved">已保存</string>
 
     <!-- Battery Guide -->
-    <string name="battery_guide_step_label">步骤 2/2</string>
+    <string name="battery_guide_step_label">电池设置</string>
     <string name="battery_guide_title">关闭电池优化</string>
     <string name="battery_guide_desc">为确保 GhostClip 在后台稳定运行，需要将应用排除在系统电池优化之外。否则系统可能在省电时关闭同步服务。</string>
     <string name="battery_guide_step1">打开系统「设置」→「电池」</string>
     <string name="battery_guide_step2">找到「GhostClip」→「无限制」</string>
     <string name="battery_guide_cta">前往电池设置</string>
+    <string name="battery_guide_success">✓ 电池优化已关闭</string>
     <string name="battery_guide_skip">稍后再说</string>
     <string name="battery_guide_open_fail">无法打开设置</string>
 

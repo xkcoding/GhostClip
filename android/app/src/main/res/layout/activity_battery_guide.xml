@@ -86,63 +86,39 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingHorizontal="8dp">
 
-            <!-- Step 1 -->
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:lineSpacingMultiplier="1.6"
+                android:text="@string/battery_guide_step1"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
 
-                <TextView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_step_number"
-                    android:gravity="center"
-                    android:text="1"
-                    android:textColor="@color/text_on_accent"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:text="@string/battery_guide_step1"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Step 2 -->
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_step_number"
-                    android:gravity="center"
-                    android:text="2"
-                    android:textColor="@color/text_on_accent"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:text="@string/battery_guide_step2"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                android:layout_marginTop="8dp"
+                android:lineSpacingMultiplier="1.6"
+                android:text="@string/battery_guide_step2"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
         </LinearLayout>
+
+        <!-- Success message (hidden by default) -->
+        <TextView
+            android:id="@+id/text_success"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="@string/battery_guide_success"
+            android:textColor="@color/accent"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <!-- Spacer -->
         <View
