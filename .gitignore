@@ -1,0 +1,28 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Cursor
+.specstory/
+.cursorindexingignore
+
+# Build outputs
+target/
+build/
+dist/
+node_modules/
+
+# Environment
+.env
+.env.local
+.dev.vars
+
+# Cloudflare
+.wrangler/
