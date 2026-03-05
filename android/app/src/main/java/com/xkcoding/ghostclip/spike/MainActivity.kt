@@ -1,9 +1,6 @@
 package com.xkcoding.ghostclip.spike
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -26,17 +23,10 @@ class MainActivity : AppCompatActivity() {
     private val logBuilder = StringBuilder()
     private val timeFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
 
-    private val clipReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val text = intent?.getStringExtra(TransparentClipboardActivity.EXTRA_CLIP_TEXT) ?: return
-            appendLog("📋 收到剪贴板内容: \"$text\"")
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 纯代码布局，不依赖 XML layout
+        // 纯代码布局
         val rootLayout = android.widget.LinearLayout(this).apply {
             orientation = android.widget.LinearLayout.VERTICAL
             setPadding(48, 48, 48, 48)
@@ -81,7 +71,7 @@ class MainActivity : AppCompatActivity() {
             text = "手动读取剪贴板"
             setPadding(24, 0, 0, 0)
             setOnClickListener {
-                appendLog("🔧 手动触发透明 Activity...")
+                appendLog("手动触发透明 Activity...")
                 val intent = Intent(this@MainActivity, TransparentClipboardActivity::class.java)
                 startActivity(intent)
             }
@@ -114,11 +104,12 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(rootLayout)
 
-        // 注册广播接收器
-        val filter = IntentFilter(TransparentClipboardActivity.ACTION_CLIPBOARD_READ)
-        registerReceiver(clipReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        // 注册 SpikeEventBus 监听
+        SpikeEventBus.register { message ->
+            appendLog(message)
+        }
 
-        appendLog("🚀 Spike 应用启动")
+        appendLog("Spike 应用启动")
         appendLog("设备: ${Build.MANUFACTURER} ${Build.MODEL}")
         appendLog("系统: Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
         appendLog("---")
@@ -133,20 +124,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(clipReceiver)
+        SpikeEventBus.unregister()
     }
 
     private fun updateAccessibilityStatus() {
         val enabled = isAccessibilityServiceEnabled()
         statusView.text = if (enabled) {
-            "✅ 无障碍服务: 已启用"
+            "无障碍服务: 已启用"
         } else {
-            "❌ 无障碍服务: 未启用 (请点击下方按钮开启)"
+            "无障碍服务: 未启用 (请点击下方按钮开启)"
         }
         statusView.setTextColor(if (enabled) 0xFF22C55E.toInt() else 0xFFEF4444.toInt())
 
         if (enabled) {
-            appendLog("✅ 无障碍服务已启用，等待复制事件...")
+            appendLog("无障碍服务已启用，等待复制事件...")
         }
     }
 
