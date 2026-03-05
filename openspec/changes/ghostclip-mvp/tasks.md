@@ -8,6 +8,7 @@
   - **结论: 采用 Plan D — 悬浮球手动触发**。用户复制文字后，点击小米悬浮球打开 App，App 在 onResume 自动读取剪贴板内容。多一步点击但 100% 可靠
   - Plan B (NotificationListener) / Plan C (IME) 暂不验证，悬浮球方案体验可接受
   - **后续 MVP 设计**: 正常点击图标 → 进入主界面；悬浮球/快捷方式带 Intent Extra(auto_sync=true) → 读取+投递+自动退回
+  - **最终验证**: onResume + onWindowFocusChanged(200ms delay) 前台读取方案在 Xiaomi 16 Pro 上验证通过，悬浮球唤起可正常读取剪贴板
 - [ ] 0.4 创建最简 Cloudflare Worker，实现 POST /clip 写入 KV 和 GET /clip 读取 KV，用 curl 验证读写和 Token 校验
 - [ ] 0.5 初始化 Tauri v2 项目，实现 Menu Bar App 骨架，验证 NSPasteboard 读写和全局快捷键注册
 
