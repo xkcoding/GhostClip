@@ -2555,35 +2555,329 @@
       "name": "App Icon — Ghost with Envelope",
       "width": 400,
       "height": 400,
-      "fill": "#F0FDF4",
-      "cornerRadius": 40,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#4ADE80",
+            "position": 0
+          },
+          {
+            "color": "#16A34A",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 72,
+      "layout": "none",
       "children": [
         {
-          "type": "frame",
-          "id": "9h1Lh",
-          "name": "Ghost Icon",
-          "width": 360,
-          "height": 360,
-          "fill": {
-            "type": "image",
-            "enabled": true,
-            "url": "./images/generated-1772739978355.png",
-            "mode": "fill"
-          },
-          "cornerRadius": 20
+          "type": "path",
+          "id": "ShDA0",
+          "x": 80,
+          "y": 60,
+          "name": "Ghost Body",
+          "geometry": "M120 0c66 0 120 54 120 120l0 100c0 25-15 40-40 40-25 0-25-30-40-30-15 0-15 30-40 30-25 0-25-30-40-30-15 0-15 30-40 30-25 0-40-15-40-40l0-100c0-66 54-120 120-120z",
+          "fill": "#FFFFFF",
+          "width": 240,
+          "height": 270,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#00000020",
+            "offset": {
+              "x": 0,
+              "y": 6
+            },
+            "blur": 20
+          }
+        },
+        {
+          "type": "path",
+          "id": "8ttWf",
+          "x": 135,
+          "y": 205,
+          "name": "Envelope Flap",
+          "geometry": "M0 30l65-30 65 30z",
+          "fill": "#16A34A",
+          "width": 130,
+          "height": 30
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": [
+            0,
+            0,
+            8,
+            8
+          ],
+          "id": "YyKHE",
+          "x": 135,
+          "y": 235,
+          "name": "Envelope Body",
+          "fill": "#22C55E",
+          "width": 130,
+          "height": 55
+        },
+        {
+          "type": "path",
+          "id": "8UZTs",
+          "x": 140,
+          "y": 238,
+          "name": "Envelope Fold",
+          "geometry": "M0 0l60 26 60-26",
+          "width": 120,
+          "height": 26,
+          "stroke": {
+            "thickness": 2.5,
+            "join": "round",
+            "cap": "round",
+            "fill": "#15803D"
+          }
+        },
+        {
+          "type": "ellipse",
+          "id": "wJm9F",
+          "x": 152,
+          "y": 135,
+          "name": "Left Eye",
+          "fill": "#1E293B",
+          "width": 24,
+          "height": 30
+        },
+        {
+          "type": "ellipse",
+          "id": "9WsU2",
+          "x": 224,
+          "y": 135,
+          "name": "Right Eye",
+          "fill": "#1E293B",
+          "width": 24,
+          "height": 30
+        },
+        {
+          "type": "ellipse",
+          "id": "FHUQC",
+          "x": 159,
+          "y": 138,
+          "name": "Left Highlight",
+          "fill": "#FFFFFF",
+          "width": 9,
+          "height": 9
+        },
+        {
+          "type": "ellipse",
+          "id": "jFocy",
+          "x": 231,
+          "y": 138,
+          "name": "Right Highlight",
+          "fill": "#FFFFFF",
+          "width": 9,
+          "height": 9
+        },
+        {
+          "type": "ellipse",
+          "id": "mSL4A",
+          "x": 133,
+          "y": 177,
+          "name": "Left Cheek",
+          "opacity": 0.35,
+          "fill": "#FCA5A5",
+          "width": 28,
+          "height": 14
+        },
+        {
+          "type": "ellipse",
+          "id": "i25al",
+          "x": 239,
+          "y": 177,
+          "name": "Right Cheek",
+          "opacity": 0.35,
+          "fill": "#FCA5A5",
+          "width": 28,
+          "height": 14
+        },
+        {
+          "type": "path",
+          "id": "Swz9z",
+          "x": 190,
+          "y": 187,
+          "name": "Mouth",
+          "geometry": "M0 0q10 6 20 0",
+          "width": 20,
+          "height": 6,
+          "stroke": {
+            "thickness": 2,
+            "cap": "round",
+            "fill": "#64748B"
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "3Spp4",
+      "x": 3803,
+      "y": 14,
+      "name": "Mac Tray Icon — Template",
+      "width": 240,
+      "height": 280,
+      "fill": "#F8F8F8",
+      "cornerRadius": 16,
+      "layout": "vertical",
+      "gap": 16,
+      "padding": 24,
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "HiSzd",
+          "name": "titleTxt",
+          "fill": "#71717A",
+          "content": "Tray Icon (44x44)",
+          "textAlign": "center",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "500"
         },
         {
           "type": "frame",
-          "id": "vbHqj",
-          "name": "Foreground (transparent)",
-          "width": 360,
-          "height": 360,
-          "fill": {
-            "type": "image",
-            "enabled": true,
-            "url": "./images/generated-1772740234140.png",
-            "mode": "fill"
-          }
+          "id": "iEfBf",
+          "name": "Icon Preview (dark bg)",
+          "width": 120,
+          "height": 44,
+          "fill": "#1E1E1E",
+          "cornerRadius": 8,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "gFwdq",
+              "x": 45,
+              "y": 7,
+              "name": "ghost-silhouette",
+              "geometry": "M15 0c8.3 0 15 6.7 15 15l0 7c0 5-3 8-6 8-3 0-3-5-5-5-2 0-2 5-4 5-2 0-2-5-4-5-2 0-2 5-5 5-3 0-6-3-6-8l0-7c0-8.3 6.7-15 15-15z",
+              "fill": "#FFFFFF",
+              "width": 30,
+              "height": 30
+            },
+            {
+              "type": "ellipse",
+              "id": "jYKFR",
+              "x": 54,
+              "y": 14,
+              "name": "left-eye",
+              "fill": "#1E1E1E",
+              "width": 5,
+              "height": 5
+            },
+            {
+              "type": "ellipse",
+              "id": "iTSmp",
+              "x": 63,
+              "y": 14,
+              "name": "right-eye",
+              "fill": "#1E1E1E",
+              "width": 5,
+              "height": 5
+            },
+            {
+              "type": "path",
+              "id": "ko7MA",
+              "x": 57,
+              "y": 23,
+              "name": "mouth",
+              "geometry": "M0 0q3 2 6 0",
+              "width": 6,
+              "height": 2,
+              "stroke": {
+                "thickness": 1.2,
+                "cap": "round",
+                "fill": "#1E1E1E"
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "C1x9G",
+          "name": "descTxt",
+          "fill": "#A1A1AA",
+          "content": "macOS menu bar template icon\nMonochrome + transparent bg\niconAsTemplate = true",
+          "lineHeight": 1.6,
+          "textAlign": "center",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "g6RA0",
+          "name": "Icon Preview (light bg)",
+          "width": 120,
+          "height": 44,
+          "fill": "#FFFFFF",
+          "cornerRadius": 8,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "#E4E4E7"
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "JIOeM",
+              "x": 45,
+              "y": 7,
+              "name": "ghost-silhouette",
+              "geometry": "M15 0c8.3 0 15 6.7 15 15l0 7c0 5-3 8-6 8-3 0-3-5-5-5-2 0-2 5-4 5-2 0-2-5-4-5-2 0-2 5-5 5-3 0-6-3-6-8l0-7c0-8.3 6.7-15 15-15z",
+              "fill": "#18181B",
+              "width": 30,
+              "height": 30
+            },
+            {
+              "type": "ellipse",
+              "id": "mp26g",
+              "x": 54,
+              "y": 14,
+              "name": "left-eye",
+              "fill": "#FFFFFF",
+              "width": 5,
+              "height": 5
+            },
+            {
+              "type": "ellipse",
+              "id": "aRZCU",
+              "x": 63,
+              "y": 14,
+              "name": "right-eye",
+              "fill": "#FFFFFF",
+              "width": 5,
+              "height": 5
+            },
+            {
+              "type": "path",
+              "id": "rgx2P",
+              "x": 57,
+              "y": 23,
+              "name": "mouth",
+              "geometry": "M0 0q3 2 6 0",
+              "width": 6,
+              "height": 2,
+              "stroke": {
+                "thickness": 1.2,
+                "cap": "round",
+                "fill": "#FFFFFF"
+              }
+            }
+          ]
         }
       ]
     }
