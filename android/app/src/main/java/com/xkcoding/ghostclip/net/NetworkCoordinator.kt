@@ -6,6 +6,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.net.wifi.WifiManager
 import android.util.Log
 import com.xkcoding.ghostclip.clip.ClipboardHelper
 import com.xkcoding.ghostclip.clip.HashPool
@@ -35,6 +36,7 @@ class NetworkCoordinator(
     private var cloudClient: CloudClient? = null
     private var presenceSM: PresenceStateMachine? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var multicastLock: WifiManager.MulticastLock? = null
 
     // 记录当前连接的 Mac 服务名
     private var connectedMacName: String = ""
@@ -81,6 +83,9 @@ class NetworkCoordinator(
             }
         }
 
+        // 0. 获取 MulticastLock（Android 默认过滤多播包，需要显式获取锁）
+        acquireMulticastLock()
+
         // 1. mDNS 局域网发现
         setupNsdDiscovery()
 
@@ -98,6 +103,7 @@ class NetworkCoordinator(
         cloudClient?.shutdown()
         presenceSM?.stop()
         unregisterNetworkCallback()
+        releaseMulticastLock()
     }
 
     private fun setupNsdDiscovery() {
@@ -271,6 +277,30 @@ class NetworkCoordinator(
         cloudClient = null
         presenceSM = null
         setupCloudSync()
+    }
+
+    private fun acquireMulticastLock() {
+        try {
+            val wifiManager = context.applicationContext
+                .getSystemService(Context.WIFI_SERVICE) as WifiManager
+            multicastLock = wifiManager.createMulticastLock("ghostclip_mdns").apply {
+                setReferenceCounted(false)
+                acquire()
+            }
+            Log.d(TAG, "MulticastLock 已获取")
+        } catch (e: Exception) {
+            Log.e(TAG, "获取 MulticastLock 失败: ${e.message}")
+        }
+    }
+
+    private fun releaseMulticastLock() {
+        multicastLock?.let {
+            if (it.isHeld) {
+                it.release()
+                Log.d(TAG, "MulticastLock 已释放")
+            }
+        }
+        multicastLock = null
     }
 
     companion object {
