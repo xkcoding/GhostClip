@@ -19,7 +19,7 @@ use std::sync::{
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
-    Emitter, Manager,
+    Emitter, Manager, WebviewWindowBuilder,
 };
 use tokio::sync::mpsc;
 
@@ -438,6 +438,30 @@ fn start_network(app_handle: tauri::AppHandle) {
     });
 }
 
+/// 打开或聚焦设置窗口
+fn show_settings_window(app: &tauri::AppHandle) {
+    // 如果窗口已存在，直接聚焦
+    if let Some(win) = app.get_webview_window("settings") {
+        let _ = win.show();
+        let _ = win.set_focus();
+        return;
+    }
+    // 创建新的设置窗口
+    match WebviewWindowBuilder::new(app, "settings", tauri::WebviewUrl::App("index.html".into()))
+        .title("GhostClip 设置")
+        .inner_size(480.0, 420.0)
+        .resizable(false)
+        .maximizable(false)
+        .build()
+    {
+        Ok(win) => {
+            // 通知前端切换到设置视图
+            let _ = win.emit("show-settings", ());
+        }
+        Err(e) => log::error!("创建设置窗口失败: {}", e),
+    }
+}
+
 fn timestamp_now() -> u64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -505,7 +529,10 @@ pub fn run() {
             let menu =
                 Menu::with_items(app, &[&status_i, &separator, &send_i, &settings_i, &quit_i])?;
 
-            let tray_icon = tauri::image::Image::from_bytes(include_bytes!("../icons/icon.png"))?;
+            let tray_icon_path = app
+                .path()
+                .resolve("resources/tray_icon.png", tauri::path::BaseDirectory::Resource)?;
+            let tray_icon = tauri::image::Image::from_path(tray_icon_path)?;
             let _tray = TrayIconBuilder::with_id("main")
                 .icon(tray_icon)
                 .icon_as_template(true)
@@ -517,7 +544,7 @@ pub fn run() {
                         trigger_send(app);
                     }
                     "settings" => {
-                        let _ = app.emit("show-settings", ());
+                        show_settings_window(app);
                     }
                     "quit" => {
                         log::info!("用户退出 GhostClip");

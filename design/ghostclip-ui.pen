@@ -1305,7 +1305,7 @@
               "id": "6EsIT",
               "name": "stepLbl4",
               "fill": "$text-tertiary",
-              "content": "步骤 2/2",
+              "content": "电池设置",
               "fontFamily": "Inter",
               "fontSize": 14,
               "fontWeight": "500"
@@ -1406,29 +1406,6 @@
                   "alignItems": "center",
                   "children": [
                     {
-                      "type": "frame",
-                      "id": "lgre7",
-                      "name": "s4s1n",
-                      "width": 28,
-                      "height": 28,
-                      "fill": "$warning",
-                      "cornerRadius": 14,
-                      "justifyContent": "center",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "K2zB0",
-                          "name": "s4s1nt",
-                          "fill": "$text-on-accent",
-                          "content": "1",
-                          "fontFamily": "Inter",
-                          "fontSize": 13,
-                          "fontWeight": "600"
-                        }
-                      ]
-                    },
-                    {
                       "type": "text",
                       "id": "IDpc8",
                       "name": "s4s1t",
@@ -1450,29 +1427,6 @@
                   "gap": 12,
                   "alignItems": "center",
                   "children": [
-                    {
-                      "type": "frame",
-                      "id": "OJJw2",
-                      "name": "s4s2n",
-                      "width": 28,
-                      "height": 28,
-                      "fill": "$warning",
-                      "cornerRadius": 14,
-                      "justifyContent": "center",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "zgSJa",
-                          "name": "s4s2nt",
-                          "fill": "$text-on-accent",
-                          "content": "2",
-                          "fontFamily": "Inter",
-                          "fontSize": 13,
-                          "fontWeight": "600"
-                        }
-                      ]
-                    },
                     {
                       "type": "text",
                       "id": "BaVIp",
@@ -1533,6 +1487,17 @@
               "fontFamily": "Inter",
               "fontSize": 14,
               "fontWeight": "500"
+            },
+            {
+              "type": "text",
+              "id": "B2tGN",
+              "name": "successMsg",
+              "fill": "#22C55E",
+              "content": "✓ 电池优化已关闭",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
             }
           ]
         }
@@ -2152,8 +2117,8 @@
     {
       "type": "frame",
       "id": "zdE0B",
-      "x": 3270,
-      "y": 0,
+      "x": 2773,
+      "y": 14,
       "name": "Mac — Settings Window",
       "clip": true,
       "width": 480,
@@ -2585,8 +2550,8 @@
     {
       "type": "frame",
       "id": "lzP7z",
-      "x": 3850,
-      "y": 0,
+      "x": 3353,
+      "y": 14,
       "name": "App Icon — Ghost with Envelope",
       "width": 400,
       "height": 400,
@@ -2606,6 +2571,19 @@
             "mode": "fill"
           },
           "cornerRadius": 20
+        },
+        {
+          "type": "frame",
+          "id": "vbHqj",
+          "name": "Foreground (transparent)",
+          "width": 360,
+          "height": 360,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "./images/generated-1772740234140.png",
+            "mode": "fill"
+          }
         }
       ]
     }
