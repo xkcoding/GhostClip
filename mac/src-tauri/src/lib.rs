@@ -505,7 +505,10 @@ pub fn run() {
             let menu =
                 Menu::with_items(app, &[&status_i, &separator, &send_i, &settings_i, &quit_i])?;
 
+            let tray_icon = tauri::image::Image::from_bytes(include_bytes!("../icons/icon.png"))?;
             let _tray = TrayIconBuilder::with_id("main")
+                .icon(tray_icon)
+                .icon_as_template(true)
                 .tooltip("GhostClip · 未连接")
                 .menu(&menu)
                 .show_menu_on_left_click(true)
