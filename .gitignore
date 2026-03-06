@@ -18,6 +18,11 @@ target/
 build/
 dist/
 node_modules/
+artifacts/
+
+# Android
+.gradle/
+local.properties
 
 # Environment
 .env

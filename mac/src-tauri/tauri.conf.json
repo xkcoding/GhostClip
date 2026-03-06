@@ -9,7 +9,21 @@
   },
   "app": {
     "withGlobalTauri": true,
-    "windows": []
+    "macOSPrivateApi": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "GhostClip",
+        "width": 360,
+        "height": 520,
+        "visible": false,
+        "resizable": false,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true
+      }
+    ]
   },
   "bundle": {
     "active": true,
@@ -25,7 +39,10 @@
     "macOS": {
       "minimumSystemVersion": "13.0",
       "signingIdentity": "-",
-      "entitlements": "Entitlements.plist"
+      "entitlements": "Entitlements.plist",
+      "dmg": {
+        "background": "icons/dmg_background.png"
+      }
     }
   },
   "plugins": {}

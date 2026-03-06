@@ -222,16 +222,6 @@ function renderSettings() {
   return `
     <div id="settings-view" class="active">
       ${renderErrorToast()}
-      <div class="title-bar">
-        <div class="traffic-lights">
-          <div class="traffic-light red" data-action="close-settings"></div>
-          <div class="traffic-light yellow"></div>
-          <div class="traffic-light green"></div>
-        </div>
-        <span class="win-title">GhostClip \u8BBE\u7F6E</span>
-        <div class="win-spacer"></div>
-      </div>
-      <div class="title-bar-divider"></div>
       <div class="settings-body">
         <!-- Hotkey Section -->
         <div class="settings-section">
@@ -353,10 +343,7 @@ async function handleSendClipboard() {
 }
 
 async function handleOpenSettings() {
-  state.currentView = 'settings';
-  // Ask Tauri to open settings window
-  await emit('open-settings');
-  render();
+  await invoke('cmd_open_settings');
 }
 
 async function handleCloseSettings() {
@@ -522,6 +509,19 @@ async function setupBackendListeners() {
     state.currentView = 'settings';
     render();
   });
+
+  // 弹出面板失焦自动隐藏（通过 Rust 命令，以便记录时间戳支持 toggle）
+  try {
+    const currentWindow = window.__TAURI__?.window?.getCurrentWindow();
+    if (currentWindow && currentWindow.label === 'main') {
+      await currentWindow.onFocusChanged(({ payload: focused }) => {
+        if (!focused) {
+          state.currentView = 'dropdown'; // 重置视图状态
+          invoke('cmd_popup_hide');
+        }
+      });
+    }
+  } catch (_) { /* ignore */ }
 }
 
 // ============================================
@@ -573,6 +573,15 @@ function formatTimeAgo(timestamp) {
 
 async function init() {
   await loadSettings();
+
+  // 根据窗口 label 自动选择视图
+  try {
+    const label = window.__TAURI__?.window?.getCurrentWindow()?.label;
+    if (label === 'settings') {
+      state.currentView = 'settings';
+    }
+  } catch (_) { /* ignore */ }
+
   render();
   attachEventListeners();
   await setupBackendListeners();

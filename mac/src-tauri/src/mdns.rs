@@ -28,7 +28,7 @@ impl MdnsService {
         let service_info = ServiceInfo::new(
             SERVICE_TYPE,
             &instance_name,
-            &format!("{}.", hostname),
+            &format!("{}.local.", hostname),
             (),
             port,
             properties,

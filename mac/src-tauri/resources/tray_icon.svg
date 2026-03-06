@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
+  <defs>
+    <mask id="m">
+      <g transform="translate(7,7)">
+        <path d="M15 0c8.3 0 15 6.7 15 15l0 7c0 5-3 8-6 8-3 0-3-5-5-5-2 0-2 5-4 5-2 0-2-5-4-5-2 0-2 5-5 5-3 0-6-3-6-8l0-7c0-8.3 6.7-15 15-15z" fill="white"/>
+        <ellipse cx="11.5" cy="9.5" rx="2.5" ry="2.5" fill="black"/>
+        <ellipse cx="20.5" cy="9.5" rx="2.5" ry="2.5" fill="black"/>
+        <path d="M12 16q3 2 6 0" stroke="black" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      </g>
+    </mask>
+  </defs>
+  <rect width="44" height="44" fill="black" mask="url(#m)"/>
+</svg>

@@ -13,12 +13,14 @@ use hash_pool::{md5_hash, HashPool};
 use network::{ConnectionState, NetworkConfig, NetworkManager};
 use settings::Settings;
 use std::sync::{
-    atomic::{AtomicIsize, Ordering},
+    atomic::{AtomicIsize, AtomicU64, Ordering},
     Arc, Mutex as StdMutex,
 };
+
+/// 记录弹出面板最后隐藏的时间戳（毫秒），用于 toggle 判断
+static LAST_POPUP_HIDE_MS: AtomicU64 = AtomicU64::new(0);
 use tauri::{
-    menu::{Menu, MenuItem},
-    tray::TrayIconBuilder,
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     Emitter, Manager, WebviewWindowBuilder,
 };
 use tokio::sync::mpsc;
@@ -438,6 +440,74 @@ fn start_network(app_handle: tauri::AppHandle) {
     });
 }
 
+/// 隐藏弹出面板并记录时间戳（供前端失焦时调用）
+#[tauri::command]
+fn cmd_popup_hide(app: tauri::AppHandle) {
+    if let Some(win) = app.get_webview_window("main") {
+        let _ = win.hide();
+    }
+    record_popup_hide_time();
+}
+
+fn record_popup_hide_time() {
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as u64;
+    LAST_POPUP_HIDE_MS.store(now, Ordering::Relaxed);
+}
+
+/// 切换弹出面板的显示/隐藏
+fn toggle_popup(app: &tauri::AppHandle, rect: tauri::Rect) {
+    let Some(win) = app.get_webview_window("main") else {
+        return;
+    };
+
+    if win.is_visible().unwrap_or(false) {
+        let _ = win.hide();
+        record_popup_hide_time();
+        return;
+    }
+
+    // 如果刚刚被失焦隐藏（<500ms），视为 toggle-off，不再显示
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as u64;
+    let last_hide = LAST_POPUP_HIDE_MS.load(Ordering::Relaxed);
+    if now.saturating_sub(last_hide) < 500 {
+        return;
+    }
+
+    // 将弹出窗口定位到托盘图标下方居中（tray rect 为物理坐标）
+    let scale = win.scale_factor().unwrap_or(2.0);
+    let popup_w = 360.0_f64;
+
+    if let (tauri::Position::Physical(pos), tauri::Size::Physical(size)) =
+        (rect.position, rect.size)
+    {
+        let x = (pos.x as f64 + size.width as f64 / 2.0) / scale - popup_w / 2.0;
+        let y = (pos.y as f64 + size.height as f64) / scale;
+
+        let _ = win.set_position(tauri::LogicalPosition::new(x, y));
+    }
+
+    // 确保显示 dropdown 视图（防止上次残留 settings 状态）
+    let _ = app.emit_to("main", "show-dropdown", ());
+
+    let _ = win.show();
+    let _ = win.set_focus();
+}
+
+#[tauri::command]
+fn cmd_open_settings(app: tauri::AppHandle) {
+    // 先隐藏弹出面板
+    if let Some(popup) = app.get_webview_window("main") {
+        let _ = popup.hide();
+    }
+    show_settings_window(&app);
+}
+
 /// 打开或聚焦设置窗口
 fn show_settings_window(app: &tauri::AppHandle) {
     // 如果窗口已存在，直接聚焦
@@ -449,14 +519,14 @@ fn show_settings_window(app: &tauri::AppHandle) {
     // 创建新的设置窗口
     match WebviewWindowBuilder::new(app, "settings", tauri::WebviewUrl::App("index.html".into()))
         .title("GhostClip 设置")
-        .inner_size(480.0, 420.0)
+        .inner_size(480.0, 600.0)
         .resizable(false)
         .maximizable(false)
         .build()
     {
         Ok(win) => {
-            // 通知前端切换到设置视图
-            let _ = win.emit("show-settings", ());
+            let _ = win.show();
+            let _ = win.set_focus();
         }
         Err(e) => log::error!("创建设置窗口失败: {}", e),
     }
@@ -516,43 +586,25 @@ pub fn run() {
                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             }
 
-            // 构建系统托盘菜单
-            let status_i =
-                MenuItem::with_id(app, "status", "GhostClip · 未连接", false, None::<&str>)?;
-            let separator = MenuItem::with_id(app, "sep", "", false, None::<&str>)?;
-            let send_i =
-                MenuItem::with_id(app, "send", "发送剪贴板 (⌘⇧C)", true, None::<&str>)?;
-            let settings_i =
-                MenuItem::with_id(app, "settings", "设置...", true, None::<&str>)?;
-            let quit_i = MenuItem::with_id(app, "quit", "退出 GhostClip", true, None::<&str>)?;
-
-            let menu =
-                Menu::with_items(app, &[&status_i, &separator, &send_i, &settings_i, &quit_i])?;
-
-            let tray_icon_path = app
-                .path()
-                .resolve("resources/tray_icon.png", tauri::path::BaseDirectory::Resource)?;
-            let tray_icon = tauri::image::Image::from_path(tray_icon_path)?;
-            let _tray = TrayIconBuilder::with_id("main")
+            // 构建系统托盘（左键点击弹出自定义面板）
+            let tray_icon = tauri::image::Image::from_bytes(include_bytes!("../resources/tray_icon.png"))?;
+            let tray = TrayIconBuilder::with_id("main")
                 .icon(tray_icon)
                 .icon_as_template(true)
                 .tooltip("GhostClip · 未连接")
-                .menu(&menu)
-                .show_menu_on_left_click(true)
-                .on_menu_event(move |app, event| match event.id().as_ref() {
-                    "send" => {
-                        trigger_send(app);
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        rect,
+                        ..
+                    } = event
+                    {
+                        toggle_popup(tray.app_handle(), rect);
                     }
-                    "settings" => {
-                        show_settings_window(app);
-                    }
-                    "quit" => {
-                        log::info!("用户退出 GhostClip");
-                        app.exit(0);
-                    }
-                    _ => {}
                 })
                 .build(app)?;
+            app.manage(tray);
 
             // 启动剪贴板 changeCount 监听
             start_clipboard_monitor(app.handle().clone());
@@ -573,6 +625,8 @@ pub fn run() {
             cmd_update_hotkey,
             cmd_get_settings,
             cmd_save_settings,
+            cmd_open_settings,
+            cmd_popup_hide,
         ])
         .run(tauri::generate_context!())
         .expect("启动 GhostClip 失败");
