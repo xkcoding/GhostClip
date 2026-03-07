@@ -4,7 +4,74 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#22C55E"
-        android:pathData="M54,54m-26,0a26,26 0,1 1,52 0a26,26 0,1 1,-52 0" />
+
+    <!-- 使用 group 变换将 240x260 的设计稿缩放到 108x108 安全区域 -->
+    <group
+        android:scaleX="0.24"
+        android:scaleY="0.24"
+        android:translateX="25.2"
+        android:translateY="22.8">
+
+        <!-- 幽灵身体（白色） -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M120,0 c66,0 120,54 120,120 l0,100 c0,25 -15,40 -40,40 c-25,0 -25,-30 -40,-30 c-15,0 -15,30 -40,30 c-25,0 -25,-30 -40,-30 c-15,0 -15,30 -40,30 c-25,0 -40,-15 -40,-40 l0,-100 c0,-66 54,-120 120,-120z" />
+
+        <!-- 信封主体 -->
+        <path
+            android:fillColor="#22C55E"
+            android:pathData="M55,180 h130 v55 h-130z" />
+
+        <!-- 信封翻盖（三角形） -->
+        <path
+            android:fillColor="#16A34A"
+            android:pathData="M55,180 l65,-30 l65,30z" />
+
+        <!-- 信封折线 -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#15803D"
+            android:strokeWidth="6"
+            android:pathData="M62,185 l58,35 l58,-35" />
+
+        <!-- 左眼 -->
+        <path
+            android:fillColor="#1E293B"
+            android:pathData="M72,95 a12,15 0 1,1 24,0 a12,15 0 1,1 -24,0" />
+
+        <!-- 右眼 -->
+        <path
+            android:fillColor="#1E293B"
+            android:pathData="M144,95 a12,15 0 1,1 24,0 a12,15 0 1,1 -24,0" />
+
+        <!-- 左眼高光 -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M84.5,87 a4.5,4.5 0 1,1 9,0 a4.5,4.5 0 1,1 -9,0" />
+
+        <!-- 右眼高光 -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M156.5,87 a4.5,4.5 0 1,1 9,0 a4.5,4.5 0 1,1 -9,0" />
+
+        <!-- 左脸红晕 -->
+        <path
+            android:fillColor="#FCA5A5"
+            android:fillAlpha="0.35"
+            android:pathData="M58,115 a14,7 0 1,1 28,0 a14,7 0 1,1 -28,0" />
+
+        <!-- 右脸红晕 -->
+        <path
+            android:fillColor="#FCA5A5"
+            android:fillAlpha="0.35"
+            android:pathData="M154,115 a14,7 0 1,1 28,0 a14,7 0 1,1 -28,0" />
+
+        <!-- 嘴巴 -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#64748B"
+            android:strokeWidth="5"
+            android:strokeLineCap="round"
+            android:pathData="M110,122 q10,6 20,0" />
+    </group>
 </vector>
