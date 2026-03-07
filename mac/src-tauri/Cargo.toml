@@ -28,7 +28,6 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time"
 tokio-tungstenite = "0.26"
 futures-util = { version = "0.3", default-features = false, features = ["sink"] }
 reqwest = { version = "0.12", features = ["json"] }
-mdns-sd = "0.12"
 hostname = "0.4"
 tauri-plugin-notification = "2"
 dirs = "6"

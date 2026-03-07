@@ -1,70 +1,54 @@
-use mdns_sd::{ServiceDaemon, ServiceInfo};
-use std::collections::HashMap;
+use std::process::{Child, Command};
 
-const SERVICE_TYPE: &str = "_ghostclip._tcp.local.";
-
-/// mDNS/Bonjour 服务注册
+/// mDNS/Bonjour 服务注册（通过 macOS 原生 dns-sd 命令）
+///
+/// mdns_sd crate 的纯 Rust mDNS daemon 与 macOS 系统 mDNSResponder 冲突，
+/// 无法正确响应 PTR 查询。改用系统 dns-sd 命令注册服务，通过 mDNSResponder
+/// 处理，确保 Android NSD 能正确发现。
 pub struct MdnsService {
-    daemon: ServiceDaemon,
-    service_fullname: String,
+    child: Child,
+    instance_name: String,
 }
 
 impl MdnsService {
     /// 注册 _ghostclip._tcp 服务
     pub fn register(port: u16, device_id: &str) -> Result<Self, String> {
-        let daemon =
-            ServiceDaemon::new().map_err(|e| format!("创建 mDNS daemon 失败: {}", e))?;
-
-        let hostname = hostname::get()
-            .map(|h| h.to_string_lossy().to_string())
-            .unwrap_or_else(|_| "ghostclip-mac".to_string());
-
         let instance_name = format!("GhostClip-{}", &device_id[..8.min(device_id.len())]);
 
-        let mut properties = HashMap::new();
-        properties.insert("device_id".to_string(), device_id.to_string());
-        properties.insert("version".to_string(), "0.1.0".to_string());
-
-        let service_info = ServiceInfo::new(
-            SERVICE_TYPE,
-            &instance_name,
-            &format!("{}.local.", hostname),
-            (),
-            port,
-            properties,
-        )
-        .map_err(|e| format!("创建 mDNS ServiceInfo 失败: {}", e))?;
-
-        let fullname = service_info.get_fullname().to_string();
-
-        daemon
-            .register(service_info)
-            .map_err(|e| format!("注册 mDNS 服务失败: {}", e))?;
+        // dns-sd -R <name> <type> <domain> <port> [<txt>...]
+        let child = Command::new("dns-sd")
+            .args([
+                "-R",
+                &instance_name,
+                "_ghostclip._tcp",
+                "local",
+                &port.to_string(),
+                &format!("device_id={}", device_id),
+                "version=0.1.0",
+            ])
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+            .map_err(|e| format!("启动 dns-sd 注册失败: {}", e))?;
 
         log::info!(
-            "mDNS 服务已注册: {} (端口 {})",
+            "mDNS 服务已注册（via dns-sd）: {} (端口 {})",
             instance_name,
             port
         );
 
         Ok(Self {
-            daemon,
-            service_fullname: fullname,
+            child,
+            instance_name,
         })
-    }
-
-    /// 注销 mDNS 服务
-    pub fn unregister(&self) -> Result<(), String> {
-        self.daemon
-            .unregister(&self.service_fullname)
-            .map_err(|e| format!("注销 mDNS 服务失败: {}", e))?;
-        log::info!("mDNS 服务已注销");
-        Ok(())
     }
 }
 
 impl Drop for MdnsService {
     fn drop(&mut self) {
-        let _ = self.unregister();
+        let _ = self.child.kill();
+        let _ = self.child.wait();
+        log::info!("mDNS 服务已注销: {}", self.instance_name);
     }
 }
