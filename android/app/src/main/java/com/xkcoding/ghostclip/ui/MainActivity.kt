@@ -230,9 +230,16 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // 防止重复上报: 内容未变不再发送
+        if (text == NetworkCoordinator.lastSentClip) {
+            DebugLog.d(TAG, "[$source] 跳过(内容与上次上报相同)")
+            return
+        }
+
         // 前台自动发送
         val sent = SyncBridge.sendClip(text, GhostClipService.hashPool, this)
         if (sent) {
+            NetworkCoordinator.lastSentClip = text
             DebugLog.d(TAG, "[$source] 已投递同步")
         } else {
             DebugLog.d(TAG, "[$source] 未发送(重复或服务未就绪)")

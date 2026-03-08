@@ -149,6 +149,7 @@ class NetworkCoordinator(
                     DebugLog.d(TAG, "LAN 收到剪贴板: hash=$hash, len=${content.length}")
                     // 记录远端内容，防止前台 readClipboard 回传 echo
                     lastReceivedClip = content
+                    lastSentClip = null // 收到新远端内容，重置上报记录
                     // Android 10+ 后台写剪贴板会静默失败，存为 pending 等前台写入
                     pendingClip = content
                     ClipboardHelper.write(context, content)
@@ -189,6 +190,7 @@ class NetworkCoordinator(
                     if (!hashPool.checkAndRecord(record.text)) {
                         DebugLog.d(TAG, "云端收到剪贴板: len=${record.text.length}")
                         lastReceivedClip = record.text
+                        lastSentClip = null // 收到新远端内容，重置上报记录
                         pendingClip = record.text
                         ClipboardHelper.write(context, record.text)
                         broadcastClipSynced(record.text, "incoming", "Mac (Cloud)")
@@ -347,6 +349,10 @@ class NetworkCoordinator(
         /** 最近一次从远端接收的剪贴板内容（防止 echo 回传） */
         @Volatile
         var lastReceivedClip: String? = null
+
+        /** 最近一次上报给 Mac 的剪贴板内容（防止相同内容重复上报） */
+        @Volatile
+        var lastSentClip: String? = null
 
         /** 同步历史（持久缓存，不清空，onResume 时读取恢复 UI） */
         private val syncHistory = mutableListOf<SyncRecord>()
