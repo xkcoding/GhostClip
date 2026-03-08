@@ -63,8 +63,10 @@ class CloudClient(
                 .build()
 
             client.newCall(request).execute().use { response ->
+                // 必须消费 response body，否则连接无法复用
+                val respBody = response.body?.string()
                 val ok = response.isSuccessful
-                if (!ok) Log.w(TAG, "POST /clip 失败: ${response.code}")
+                if (!ok) Log.w(TAG, "POST /clip 失败: ${response.code}, body=$respBody")
                 ok
             }
         } catch (e: Exception) {
@@ -79,7 +81,9 @@ class CloudClient(
      */
     suspend fun getClip(lastHash: String?): ClipRecord? = withContext(Dispatchers.IO) {
         try {
-            val url = if (lastHash != null) "$baseUrl/clip?last_hash=$lastHash" else "$baseUrl/clip"
+            val urlBuilder = StringBuilder("$baseUrl/clip?device_id=$deviceId")
+            if (lastHash != null) urlBuilder.append("&last_hash=$lastHash")
+            val url = urlBuilder.toString()
             val request = Request.Builder()
                 .url(url)
                 .addHeader("Authorization", "Bearer $token")

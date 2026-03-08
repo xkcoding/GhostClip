@@ -65,14 +65,18 @@ app.post("/clip", async (c: AppContext) => {
     hash: body.hash,
     timestamp: body.timestamp,
   };
-  await c.env.KV.put("clip:latest", JSON.stringify(record));
+  // TTL 1 小时，过期后自动清除旧剪贴板数据
+  await c.env.KV.put("clip:latest", JSON.stringify(record), {
+    expirationTtl: 3600,
+  });
 
   return c.json({ status: "ok", hash: body.hash });
 });
 
-// GET /clip - 读取最新剪贴板内容，支持 last_hash 比对
+// GET /clip - 读取最新剪贴板内容，支持 last_hash 比对和 device_id 过滤
 app.get("/clip", async (c: AppContext) => {
   const lastHash = c.req.query("last_hash");
+  const deviceId = c.req.query("device_id");
 
   const raw = await c.env.KV.get("clip:latest");
   if (!raw) {
@@ -84,6 +88,11 @@ app.get("/clip", async (c: AppContext) => {
 
   // 客户端已有相同内容，返回 304
   if (lastHash && lastHash === record.hash) {
+    return c.body(null, 304);
+  }
+
+  // 过滤自己发送的内容，防止 echo（设备不应拿到自己刚发的剪贴板）
+  if (deviceId && deviceId === record.device_id) {
     return c.body(null, 304);
   }
 
