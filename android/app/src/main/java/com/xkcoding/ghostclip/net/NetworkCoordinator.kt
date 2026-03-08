@@ -147,6 +147,8 @@ class NetworkCoordinator(
             override fun onClipReceived(content: String, hash: String, deviceId: String) {
                 if (!hashPool.checkAndRecord(content)) {
                     DebugLog.d(TAG, "LAN 收到剪贴板: hash=$hash, len=${content.length}")
+                    // 记录远端内容，防止前台 readClipboard 回传 echo
+                    lastReceivedClip = content
                     // Android 10+ 后台写剪贴板会静默失败，存为 pending 等前台写入
                     pendingClip = content
                     ClipboardHelper.write(context, content)
@@ -186,6 +188,7 @@ class NetworkCoordinator(
                 override fun onNewClip(record: CloudClient.ClipRecord) {
                     if (!hashPool.checkAndRecord(record.text)) {
                         DebugLog.d(TAG, "云端收到剪贴板: len=${record.text.length}")
+                        lastReceivedClip = record.text
                         pendingClip = record.text
                         ClipboardHelper.write(context, record.text)
                         broadcastClipSynced(record.text, "incoming", "Mac (Cloud)")
@@ -338,6 +341,10 @@ class NetworkCoordinator(
         /** 后台收到的剪贴板内容，等前台 Activity 写入 */
         @Volatile
         var pendingClip: String? = null
+
+        /** 最近一次从远端接收的剪贴板内容（防止 echo 回传） */
+        @Volatile
+        var lastReceivedClip: String? = null
 
         /** 消费 pending clip（前台 Activity 调用后清空） */
         fun consumePendingClip(): String? {

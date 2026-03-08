@@ -539,8 +539,18 @@ async function setupBackendListeners() {
   });
 
   // Listen for view switch commands from tray menu
-  await listen('show-dropdown', () => {
+  await listen('show-dropdown', async () => {
     state.currentView = 'dropdown';
+    // 主动查询当前连接状态（补偿 popup 隐藏期间错过的事件）
+    try {
+      const result = await invoke('cmd_get_connection_state');
+      if (result) {
+        const data = typeof result === 'string' ? JSON.parse(result) : result;
+        state.connectionState = data.state || state.connectionState;
+        state.deviceName = data.deviceName || state.deviceName;
+        state.connectionLabel = data.connectionLabel || state.connectionLabel;
+      }
+    } catch (_) { /* ignore */ }
     render();
   });
 

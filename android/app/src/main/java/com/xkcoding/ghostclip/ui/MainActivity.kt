@@ -118,6 +118,8 @@ class MainActivity : AppCompatActivity() {
         NetworkCoordinator.consumePendingClip()?.let { text ->
             DebugLog.d(TAG, "前台写入 pending 远端剪贴板: ${text.take(80)}")
             ClipboardHelper.write(this, text)
+            // 刷新 hash pool TTL，防止 readClipboard 时 TTL 已过期导致重复发送
+            GhostClipService.hashPool.checkAndRecord(text)
         }
 
         // 延迟读取剪贴板（等待 window focus）
@@ -138,6 +140,7 @@ class MainActivity : AppCompatActivity() {
             NetworkCoordinator.consumePendingClip()?.let { text ->
                 DebugLog.d(TAG, "focus 时写入 pending 远端剪贴板: ${text.take(80)}")
                 ClipboardHelper.write(this, text)
+                GhostClipService.hashPool.checkAndRecord(text)
             }
 
             handler.postDelayed({ readClipboard("onFocus") }, 100)
@@ -196,6 +199,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
         DebugLog.d(TAG, "[$source] 读取剪贴板: ${text.take(80)}")
+
+        // 防止 echo: 如果内容与最近从远端收到的一致，不回传
+        val lastReceived = NetworkCoordinator.lastReceivedClip
+        if (lastReceived != null && text == lastReceived) {
+            DebugLog.d(TAG, "[$source] 跳过回传(内容来自远端)")
+            return
+        }
 
         // 前台自动发送
         val sent = SyncBridge.sendClip(text, GhostClipService.hashPool, this)

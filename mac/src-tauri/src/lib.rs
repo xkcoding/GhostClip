@@ -13,7 +13,7 @@ use hash_pool::{md5_hash, HashPool};
 use network::{ConnectionState, NetworkConfig, NetworkManager};
 use settings::Settings;
 use std::sync::{
-    atomic::{AtomicIsize, AtomicU64, Ordering},
+    atomic::{AtomicIsize, AtomicU8, AtomicU64, Ordering},
     Arc, Mutex as StdMutex, OnceLock,
 };
 
@@ -48,6 +48,32 @@ pub struct AppState {
     pub network: Arc<tokio::sync::Mutex<Option<Arc<NetworkManager>>>>,
     pub device_id: String,
     pub settings: StdMutex<Settings>,
+    /// 缓存的连接状态 (0=Disconnected, 1=Lan, 2=Cloud)
+    pub current_conn_state: AtomicU8,
+}
+
+/// 安全截取 UTF-8 字符串（按字符数，不按字节）
+fn truncate_str(s: &str, max_chars: usize) -> &str {
+    match s.char_indices().nth(max_chars) {
+        Some((idx, _)) => &s[..idx],
+        None => s,
+    }
+}
+
+fn conn_state_to_u8(state: ConnectionState) -> u8 {
+    match state {
+        ConnectionState::Disconnected => 0,
+        ConnectionState::Lan => 1,
+        ConnectionState::Cloud => 2,
+    }
+}
+
+fn u8_to_conn_state(v: u8) -> ConnectionState {
+    match v {
+        1 => ConnectionState::Lan,
+        2 => ConnectionState::Cloud,
+        _ => ConnectionState::Disconnected,
+    }
 }
 
 // ============================================
@@ -77,6 +103,24 @@ fn cmd_md5_hash(text: String) -> String {
 #[tauri::command]
 fn cmd_trigger_send(app: tauri::AppHandle) {
     trigger_send(&app);
+}
+
+/// 前端请求当前连接状态（用于 popup 显示时补偿错过的事件）
+#[tauri::command]
+fn cmd_get_connection_state(app: tauri::AppHandle) -> String {
+    let state = app.state::<AppState>();
+    let cached = state.current_conn_state.load(Ordering::Relaxed);
+    let conn = u8_to_conn_state(cached);
+    let (state_str, label) = match conn {
+        ConnectionState::Lan => ("connected", "局域网直连"),
+        ConnectionState::Cloud => ("cloud", "云端同步"),
+        ConnectionState::Disconnected => ("disconnected", "未连接"),
+    };
+    serde_json::json!({
+        "state": state_str,
+        "deviceName": "Android",
+        "connectionLabel": label,
+    }).to_string()
 }
 
 #[tauri::command]
@@ -186,14 +230,14 @@ fn trigger_send(app: &tauri::AppHandle) {
                     "发送剪贴板 - 哈希: {}, 长度: {}, 前50字符: {}",
                     hash,
                     text.len(),
-                    &text[..text.len().min(50)]
+                    truncate_str(&text, 50)
                 ));
 
                 // 发射 clip-synced 事件到前端
                 let _ = app.emit(
                     "clip-synced",
                     serde_json::json!({
-                        "text": &text[..text.len().min(200)],
+                        "text": truncate_str(&text, 200),
                         "direction": "outgoing",
                         "timestamp": timestamp_now(),
                     }),
@@ -266,7 +310,7 @@ fn generate_device_id() -> String {
 /// 发送系统通知
 fn send_notification(app: &tauri::AppHandle, text: &str) {
     use tauri_plugin_notification::NotificationExt;
-    let preview = &text[..text.len().min(100)];
+    let preview = truncate_str(text, 100);
     let _ = app
         .notification()
         .builder()
@@ -286,6 +330,11 @@ fn emit_connection_state_with_error(
     conn_state: ConnectionState,
     error: Option<&str>,
 ) {
+    // 缓存连接状态到 AppState
+    if let Some(app_state) = app.try_state::<AppState>() {
+        app_state.current_conn_state.store(conn_state_to_u8(conn_state), Ordering::Relaxed);
+    }
+
     let (state_str, label) = match conn_state {
         ConnectionState::Lan => ("connected", "局域网直连"),
         ConnectionState::Cloud => ("cloud", "云端同步"),
@@ -428,14 +477,14 @@ fn start_network(app_handle: tauri::AppHandle) {
                     .store(get_change_count(), Ordering::Relaxed);
                 debug_log(&format!(
                     "远端剪贴板已写入本地, 前50字符: {}",
-                    &text[..text.len().min(50)]
+                    truncate_str(&text, 50)
                 ));
 
                 // 发射 clip-synced 事件
                 let _ = app_handle.emit(
                     "clip-synced",
                     serde_json::json!({
-                        "text": &text[..text.len().min(200)],
+                        "text": truncate_str(&text, 200),
                         "direction": "incoming",
                         "timestamp": timestamp_now(),
                     }),
@@ -513,6 +562,13 @@ fn toggle_popup(app: &tauri::AppHandle, rect: tauri::Rect) {
 
     let _ = win.show();
     let _ = win.set_focus();
+
+    // 重新发射缓存的连接状态（补偿 popup 隐藏期间错过的事件）
+    if let Some(app_state) = app.try_state::<AppState>() {
+        let cached = app_state.current_conn_state.load(Ordering::Relaxed);
+        let conn = u8_to_conn_state(cached);
+        emit_connection_state(app, conn);
+    }
 }
 
 #[tauri::command]
@@ -575,6 +631,7 @@ pub fn run() {
         network: Arc::new(tokio::sync::Mutex::new(None)),
         device_id,
         settings: StdMutex::new(loaded_settings),
+        current_conn_state: AtomicU8::new(0), // Disconnected
     };
 
     tauri::Builder::default()
@@ -640,6 +697,7 @@ pub fn run() {
             cmd_get_change_count,
             cmd_md5_hash,
             cmd_trigger_send,
+            cmd_get_connection_state,
             cmd_quit,
             cmd_update_hotkey,
             cmd_get_settings,
