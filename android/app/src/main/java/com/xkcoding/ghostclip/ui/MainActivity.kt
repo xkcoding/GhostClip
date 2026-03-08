@@ -114,26 +114,30 @@ class MainActivity : AppCompatActivity() {
         DebugLog.d(TAG, "查询连接状态: ${state.name}, device=${NetworkCoordinator.lastDeviceName}")
         updateConnectionUI(state.name, NetworkCoordinator.lastDeviceName, NetworkCoordinator.lastConnLabel)
 
-        // 消费缓存的同步记录（补偿 Activity 不在前台时丢失的广播）
-        val pendingRecords = NetworkCoordinator.consumePendingSyncRecords()
-        if (pendingRecords.isNotEmpty()) {
-            DebugLog.d(TAG, "恢复 ${pendingRecords.size} 条同步记录")
+        // 从同步历史恢复列表（持久缓存，不清空，覆盖 UI 列表）
+        val history = NetworkCoordinator.getSyncHistory()
+        if (history.isNotEmpty()) {
+            DebugLog.d(TAG, "恢复 ${history.size} 条同步记录")
             syncRecords.clear()
-            for (record in pendingRecords) {
-                syncRecords.add(SyncRecord(record.text, record.direction, record.source, System.currentTimeMillis()))
-            }
-            if (syncRecords.size > 20) {
-                while (syncRecords.size > 20) syncRecords.removeAt(0)
+            for (record in history) {
+                syncRecords.add(SyncRecord(record.text, record.direction, record.source, record.timestamp))
             }
             refreshSyncList()
         }
 
         // 检查后台收到的远端剪贴板（Android 10+ 后台无法写入剪贴板，在前台补写）
-        NetworkCoordinator.consumePendingClip()?.let { text ->
-            DebugLog.d(TAG, "前台写入 pending 远端剪贴板: ${text.take(80)}")
-            ClipboardHelper.write(this, text)
-            // 刷新 hash pool TTL，防止 readClipboard 时 TTL 已过期导致重复发送
-            GhostClipService.hashPool.checkAndRecord(text)
+        NetworkCoordinator.consumePendingClip()?.let { pendingText ->
+            val currentClip = ClipboardHelper.read(this)
+            if (currentClip == null || currentClip.isBlank() || currentClip == pendingText) {
+                // 剪贴板为空或已是该内容 → 写入
+                DebugLog.d(TAG, "前台写入 pending 远端剪贴板: ${pendingText.take(80)}")
+                ClipboardHelper.write(this, pendingText)
+            } else {
+                // 用户已复制新内容 → 不覆盖
+                DebugLog.d(TAG, "跳过 pendingClip(用户已有新剪贴板内容: ${currentClip.take(40)})")
+            }
+            // 无论是否写入，都刷新 hash TTL 防止 echo
+            GhostClipService.hashPool.checkAndRecord(pendingText)
         }
 
         // 延迟读取剪贴板（等待 window focus）
@@ -151,10 +155,15 @@ class MainActivity : AppCompatActivity() {
             DebugLog.d(TAG, "onWindowFocusChanged: hasFocus=true")
 
             // 再次检查 pending clip（window focus 后写剪贴板更可靠）
-            NetworkCoordinator.consumePendingClip()?.let { text ->
-                DebugLog.d(TAG, "focus 时写入 pending 远端剪贴板: ${text.take(80)}")
-                ClipboardHelper.write(this, text)
-                GhostClipService.hashPool.checkAndRecord(text)
+            NetworkCoordinator.consumePendingClip()?.let { pendingText ->
+                val currentClip = ClipboardHelper.read(this)
+                if (currentClip == null || currentClip.isBlank() || currentClip == pendingText) {
+                    DebugLog.d(TAG, "focus 时写入 pending 远端剪贴板: ${pendingText.take(80)}")
+                    ClipboardHelper.write(this, pendingText)
+                } else {
+                    DebugLog.d(TAG, "focus 跳过 pendingClip(用户已有新剪贴板内容)")
+                }
+                GhostClipService.hashPool.checkAndRecord(pendingText)
             }
 
             handler.postDelayed({ readClipboard("onFocus") }, 100)

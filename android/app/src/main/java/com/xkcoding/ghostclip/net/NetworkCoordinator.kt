@@ -282,8 +282,8 @@ class NetworkCoordinator(
      * 广播同步事件给 UI -- 显示同步记录
      */
     private fun broadcastClipSynced(text: String, direction: String, source: String) {
-        // 始终缓存同步记录（onResume 时消费，补偿 Activity 不在前台时丢失的广播）
-        addPendingSyncRecord(text, direction, source)
+        // 缓存到同步历史（onResume 时读取，补偿 Activity 不在前台时丢失的广播）
+        addSyncRecord(text, direction, source)
         context.sendBroadcast(Intent(MainActivity.ACTION_CLIP_SYNCED).apply {
             setPackage(context.packageName)
             putExtra("text", text)
@@ -348,25 +348,22 @@ class NetworkCoordinator(
         @Volatile
         var lastReceivedClip: String? = null
 
-        /** 后台积累的同步记录，前台 Activity 回来时消费显示 */
-        private val pendingSyncRecords = mutableListOf<SyncRecord>()
+        /** 同步历史（持久缓存，不清空，onResume 时读取恢复 UI） */
+        private val syncHistory = mutableListOf<SyncRecord>()
 
-        data class SyncRecord(val text: String, val direction: String, val source: String)
+        data class SyncRecord(val text: String, val direction: String, val source: String, val timestamp: Long = System.currentTimeMillis())
 
-        fun addPendingSyncRecord(text: String, direction: String, source: String) {
-            synchronized(pendingSyncRecords) {
-                pendingSyncRecords.add(SyncRecord(text, direction, source))
-                // 最多缓存 20 条
-                if (pendingSyncRecords.size > 20) pendingSyncRecords.removeAt(0)
+        fun addSyncRecord(text: String, direction: String, source: String) {
+            synchronized(syncHistory) {
+                syncHistory.add(0, SyncRecord(text, direction, source))
+                if (syncHistory.size > 20) syncHistory.removeAt(syncHistory.size - 1)
             }
         }
 
-        /** 消费所有 pending 同步记录（前台 Activity 调用后清空） */
-        fun consumePendingSyncRecords(): List<SyncRecord> {
-            synchronized(pendingSyncRecords) {
-                val copy = pendingSyncRecords.toList()
-                pendingSyncRecords.clear()
-                return copy
+        /** 获取同步历史快照（不清空） */
+        fun getSyncHistory(): List<SyncRecord> {
+            synchronized(syncHistory) {
+                return syncHistory.toList()
             }
         }
 
