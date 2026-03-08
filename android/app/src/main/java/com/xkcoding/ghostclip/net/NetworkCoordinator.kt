@@ -205,8 +205,7 @@ class NetworkCoordinator(
         networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 DebugLog.d(TAG, "WiFi 连接 -- 重新启动 mDNS 发现")
-                nsdDiscovery?.stopDiscovery()
-                nsdDiscovery?.startDiscovery()
+                nsdDiscovery?.restartDiscovery()
             }
 
             override fun onLost(network: Network) {
