@@ -56,6 +56,8 @@ const state = {
     cloudEnabled: true,
     notificationsEnabled: true,
   },
+  // Debug logs
+  debugLogs: [],
   // UI state
   currentView: 'dropdown', // 'dropdown' | 'settings'
   isRecordingHotkey: false,
@@ -200,6 +202,17 @@ function renderDropdown() {
             <span class="text">\u9000\u51FA GhostClip</span>
           </div>
         </div>
+        <div class="divider"></div>
+        <div class="debug-section">
+          <div class="debug-header">
+            <span class="section-label">\u8C03\u8BD5\u65E5\u5FD7</span>
+            <span class="debug-clear" data-action="clear-logs">\u6E05\u9664</span>
+          </div>
+          <div class="debug-logs" id="debug-logs">${state.debugLogs.length === 0 ?
+            '<span class="debug-empty">\u6682\u65E0\u65E5\u5FD7</span>' :
+            state.debugLogs.map(l => `<div class="debug-line">${escapeHtml(l)}</div>`).join('')
+          }</div>
+        </div>
       </div>
     </div>
   `;
@@ -308,6 +321,10 @@ function attachEventListeners() {
         break;
       case 'toggle-notif':
         handleToggleNotification();
+        break;
+      case 'clear-logs':
+        state.debugLogs = [];
+        render();
         break;
       case 'dismiss-error':
         state.errorMessage = '';
@@ -497,6 +514,28 @@ async function setupBackendListeners() {
     const { message } = event.payload;
     const level = classifyError(message);
     showError(message, level);
+  });
+
+  // Listen for debug log events from Rust backend
+  await listen('debug-log', (event) => {
+    const { message } = event.payload;
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    state.debugLogs.push(`${time} ${message}`);
+    if (state.debugLogs.length > 100) {
+      state.debugLogs = state.debugLogs.slice(-100);
+    }
+    // Auto-scroll debug logs without full re-render
+    const logsEl = document.getElementById('debug-logs');
+    if (logsEl) {
+      const line = document.createElement('div');
+      line.className = 'debug-line';
+      line.textContent = `${time} ${message}`;
+      // Remove empty placeholder if present
+      const empty = logsEl.querySelector('.debug-empty');
+      if (empty) empty.remove();
+      logsEl.appendChild(line);
+      logsEl.scrollTop = logsEl.scrollHeight;
+    }
   });
 
   // Listen for view switch commands from tray menu

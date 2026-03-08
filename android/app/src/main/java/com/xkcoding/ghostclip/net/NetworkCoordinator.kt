@@ -7,12 +7,12 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.wifi.WifiManager
-import android.util.Log
 import com.xkcoding.ghostclip.clip.ClipboardHelper
 import com.xkcoding.ghostclip.clip.HashPool
 import com.xkcoding.ghostclip.clip.SyncBridge
 import com.xkcoding.ghostclip.service.GhostClipService
 import com.xkcoding.ghostclip.ui.MainActivity
+import com.xkcoding.ghostclip.util.DebugLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -59,6 +59,8 @@ class NetworkCoordinator(
      * 启动全部网络 -- 由 GhostClipService.onCreate 调用
      */
     fun start() {
+        DebugLog.d(TAG, "NetworkCoordinator 启动, deviceId=$deviceId")
+
         // 注册 SyncBridge callback -- 发送剪贴板时走这里
         SyncBridge.callback = object : SyncBridge.SyncCallback {
             override fun onSend(text: String, hash: String) {
@@ -66,7 +68,7 @@ class NetworkCoordinator(
                     // 优先 LAN
                     val sentViaLan = lanClient?.sendClip(text, hash) == true
                     if (sentViaLan) {
-                        Log.d(TAG, "已通过 LAN 发送")
+                        DebugLog.d(TAG, "已通过 LAN 发送 (hash=$hash)")
                         broadcastClipSynced(text, "outgoing", connectedMacName.ifEmpty { "Mac" })
                         return@launch
                     }
@@ -74,10 +76,10 @@ class NetworkCoordinator(
                     val cloud = cloudClient
                     if (cloud != null) {
                         val ok = cloud.postClip(text, hash)
-                        Log.d(TAG, "云端发送 ${if (ok) "成功" else "失败"}")
+                        DebugLog.d(TAG, "云端发送 ${if (ok) "成功" else "失败"} (hash=$hash)")
                         if (ok) broadcastClipSynced(text, "outgoing", "Mac (Cloud)")
                     } else {
-                        Log.w(TAG, "无可用发送通道 -- 云端未配置")
+                        DebugLog.w(TAG, "无可用发送通道 -- LAN 未连接且云端未配置")
                     }
                 }
             }
@@ -97,6 +99,7 @@ class NetworkCoordinator(
     }
 
     fun stop() {
+        DebugLog.d(TAG, "NetworkCoordinator 停止")
         SyncBridge.callback = null
         nsdDiscovery?.stopDiscovery()
         lanClient?.shutdown()
@@ -110,13 +113,13 @@ class NetworkCoordinator(
         nsdDiscovery = NsdDiscovery(context).apply {
             listener = object : NsdDiscovery.Listener {
                 override fun onServiceFound(host: String, port: Int, serviceName: String) {
-                    Log.d(TAG, "发现 Mac 服务: $host:$port")
+                    DebugLog.d(TAG, "发现 Mac 服务: $serviceName @ $host:$port")
                     connectedMacName = serviceName
                     connectLan(host, port)
                 }
 
                 override fun onServiceLost(serviceName: String) {
-                    Log.d(TAG, "Mac 服务丢失: $serviceName")
+                    DebugLog.d(TAG, "Mac 服务丢失: $serviceName")
                     connectedMacName = ""
                     lanClient?.disconnect()
                     updateServiceState()
@@ -132,20 +135,22 @@ class NetworkCoordinator(
         }
         lanClient!!.listener = object : LanClient.Listener {
             override fun onConnected() {
-                Log.d(TAG, "LAN WebSocket 已连接")
+                DebugLog.d(TAG, "LAN WebSocket 已连接 -> $host:$port")
                 updateServiceState()
             }
 
             override fun onDisconnected() {
-                Log.d(TAG, "LAN WebSocket 断开")
+                DebugLog.d(TAG, "LAN WebSocket 断开")
                 updateServiceState()
             }
 
             override fun onClipReceived(content: String, hash: String, deviceId: String) {
                 if (!hashPool.checkAndRecord(content)) {
                     ClipboardHelper.write(context, content)
-                    Log.d(TAG, "LAN 收到: ${content.take(50)}...")
+                    DebugLog.d(TAG, "LAN 收到剪贴板: hash=$hash, len=${content.length}")
                     broadcastClipSynced(content, "incoming", connectedMacName.ifEmpty { "Mac" })
+                } else {
+                    DebugLog.d(TAG, "LAN 收到重复内容, 跳过: hash=$hash")
                 }
             }
         }
@@ -158,25 +163,28 @@ class NetworkCoordinator(
         val cloudEnabled = prefs.getBoolean("cloud_enabled", false)
 
         if (!cloudEnabled || cloudUrl.isNullOrBlank() || cloudToken.isNullOrBlank()) {
-            Log.d(TAG, "云端同步未启用")
+            DebugLog.d(TAG, "云端同步未启用 (enabled=$cloudEnabled)")
             return
         }
 
+        DebugLog.d(TAG, "启动云端同步: $cloudUrl")
         cloudClient = CloudClient(cloudUrl, cloudToken, deviceId)
         presenceSM = PresenceStateMachine(scope, cloudClient!!).apply {
             listener = object : PresenceStateMachine.Listener {
                 override fun onPeerOnline() {
+                    DebugLog.d(TAG, "云端: Mac 上线")
                     updateServiceState()
                 }
 
                 override fun onPeerOffline() {
+                    DebugLog.d(TAG, "云端: Mac 离线")
                     updateServiceState()
                 }
 
                 override fun onNewClip(record: CloudClient.ClipRecord) {
                     if (!hashPool.checkAndRecord(record.text)) {
                         ClipboardHelper.write(context, record.text)
-                        Log.d(TAG, "云端收到: ${record.text.take(50)}...")
+                        DebugLog.d(TAG, "云端收到剪贴板: len=${record.text.length}")
                         broadcastClipSynced(record.text, "incoming", "Mac (Cloud)")
                     }
                 }
@@ -193,13 +201,13 @@ class NetworkCoordinator(
 
         networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                Log.d(TAG, "WiFi 连接 -- mDNS 重新发现")
+                DebugLog.d(TAG, "WiFi 连接 -- 重新启动 mDNS 发现")
                 nsdDiscovery?.stopDiscovery()
                 nsdDiscovery?.startDiscovery()
             }
 
             override fun onLost(network: Network) {
-                Log.d(TAG, "WiFi 断开 -- LAN 不可用")
+                DebugLog.d(TAG, "WiFi 断开 -- LAN 不可用")
                 connectedMacName = ""
                 lanClient?.disconnect()
                 updateServiceState()
@@ -243,6 +251,8 @@ class NetworkCoordinator(
             }
         }
 
+        DebugLog.d(TAG, "连接状态更新: ${state.name}")
+
         // 更新通知栏
         val serviceIntent = Intent(context, GhostClipService::class.java).apply {
             putExtra(GhostClipService.EXTRA_CONNECTION_STATE, state.name)
@@ -272,6 +282,7 @@ class NetworkCoordinator(
 
     /** 重新加载云端配置 */
     fun reloadCloudConfig() {
+        DebugLog.d(TAG, "重新加载云端配置")
         cloudClient?.shutdown()
         presenceSM?.stop()
         cloudClient = null
@@ -287,9 +298,9 @@ class NetworkCoordinator(
                 setReferenceCounted(false)
                 acquire()
             }
-            Log.d(TAG, "MulticastLock 已获取")
+            DebugLog.d(TAG, "MulticastLock 已获取")
         } catch (e: Exception) {
-            Log.e(TAG, "获取 MulticastLock 失败: ${e.message}")
+            DebugLog.e(TAG, "获取 MulticastLock 失败: ${e.message}")
         }
     }
 
@@ -297,7 +308,7 @@ class NetworkCoordinator(
         multicastLock?.let {
             if (it.isHeld) {
                 it.release()
-                Log.d(TAG, "MulticastLock 已释放")
+                DebugLog.d(TAG, "MulticastLock 已释放")
             }
         }
         multicastLock = null

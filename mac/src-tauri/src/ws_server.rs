@@ -75,7 +75,7 @@ impl WsServer {
             .map_err(|e| format!("获取本地地址失败: {}", e))?
             .port();
 
-        log::info!("WebSocket Server 已启动: 0.0.0.0:{}", local_port);
+        crate::debug_log(&format!("WebSocket Server 已启动: 0.0.0.0:{}", local_port));
 
         let sender = self.sender.clone();
         let clients = self.clients.clone();
@@ -86,7 +86,7 @@ impl WsServer {
             loop {
                 match listener.accept().await {
                     Ok((stream, addr)) => {
-                        log::info!("WebSocket 新连接: {}", addr);
+                        crate::debug_log(&format!("WebSocket 新连接: {}", addr));
                         let sender = sender.clone();
                         let clients = clients.clone();
                         let incoming_tx = incoming_tx.clone();
@@ -182,11 +182,11 @@ async fn handle_connection(
                                 if let Some(client) = clients_lock.get_mut(&addr) {
                                     if client.device_id.is_empty() {
                                         client.device_id = clip_msg.device_id.clone();
-                                        log::info!(
+                                        crate::debug_log(&format!(
                                             "WebSocket 客户端 {} 确认设备: {}",
                                             addr,
                                             clip_msg.device_id
-                                        );
+                                        ));
                                     }
                                 }
                             }
@@ -234,7 +234,7 @@ async fn handle_connection(
     {
         let mut clients_lock = clients.write().await;
         if let Some(client) = clients_lock.remove(&addr) {
-            log::info!("WebSocket 客户端断开: {} ({})", addr, client.device_id);
+            crate::debug_log(&format!("WebSocket 客户端断开: {} ({})", addr, client.device_id));
         }
     }
 

@@ -1,6 +1,6 @@
 package com.xkcoding.ghostclip.net
 
-import android.util.Log
+import com.xkcoding.ghostclip.util.DebugLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 /**
  * 局域网 WebSocket Client
  *
- * Mac 端 WebSocket Server 通过 mDNS 发现后, Server 端发起 WebSocket 连接
+ * Mac 端 WebSocket Server 通过 mDNS 发现后, 发起 WebSocket 连接
  *
  * 消息格式 JSON (与 Mac ws_server.rs ClipMessage 对齐):
  * - 发送: {"device_id":"...","text":"...","hash":"...","timestamp":...}
@@ -60,12 +60,12 @@ class LanClient(
         currentPort = port
 
         val url = "ws://$host:$port"
-        Log.d(TAG, "连接 WebSocket: $url")
+        DebugLog.d(TAG, "连接 WebSocket: $url")
 
         val request = Request.Builder().url(url).build()
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
-                Log.d(TAG, "WebSocket 已连接")
+                DebugLog.d(TAG, "WebSocket 已连接 -> $url")
                 isConnected = true
                 listener?.onConnected()
             }
@@ -77,21 +77,22 @@ class LanClient(
                     val clipText = json.getString("text")
                     val hash = json.getString("hash")
                     val senderDeviceId = json.getString("device_id")
+                    DebugLog.d(TAG, "收到消息: hash=$hash, from=$senderDeviceId, len=${clipText.length}")
                     listener?.onClipReceived(clipText, hash, senderDeviceId)
                 } catch (e: Exception) {
-                    Log.e(TAG, "解析 WebSocket 消息失败: ${e.message}")
+                    DebugLog.e(TAG, "解析 WebSocket 消息失败: ${e.message}")
                 }
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                Log.w(TAG, "WebSocket 失败: ${t.message}")
+                DebugLog.w(TAG, "WebSocket 失败: ${t.message}")
                 isConnected = false
                 listener?.onDisconnected()
                 scheduleReconnect()
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                Log.d(TAG, "WebSocket 关闭: $reason")
+                DebugLog.d(TAG, "WebSocket 关闭: code=$code, reason=$reason")
                 isConnected = false
                 listener?.onDisconnected()
             }
@@ -111,7 +112,9 @@ class LanClient(
             put("hash", hash)
             put("timestamp", System.currentTimeMillis())
         }
-        return ws.send(json.toString())
+        val ok = ws.send(json.toString())
+        DebugLog.d(TAG, "发送剪贴板: hash=$hash, len=${content.length}, ok=$ok")
+        return ok
     }
 
     fun disconnect() {
@@ -123,7 +126,7 @@ class LanClient(
     }
 
     /**
-     * 断线重连 -- 3s 后重试, 失败则重新 mDNS 发现
+     * 断线重连 -- 3s 后重试
      */
     private fun scheduleReconnect() {
         reconnectJob?.cancel()
@@ -131,7 +134,7 @@ class LanClient(
             delay(RECONNECT_DELAY_MS)
             if (!isActive) return@launch
             val host = currentHost ?: return@launch
-            Log.d(TAG, "重连 WebSocket...")
+            DebugLog.d(TAG, "重连 WebSocket -> $host:$currentPort ...")
             connect(host, currentPort)
         }
     }

@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -19,9 +20,10 @@ import com.xkcoding.ghostclip.R
 import com.xkcoding.ghostclip.clip.ClipboardHelper
 import com.xkcoding.ghostclip.clip.SyncBridge
 import com.xkcoding.ghostclip.service.GhostClipService
+import com.xkcoding.ghostclip.util.DebugLog
 
 /**
- * 主界面 — 连接状态、最近同步记录
+ * 主界面 -- 连接状态、最近同步记录、调试日志
  *
  * Intent auto_sync=true 时转发到 QuickSyncActivity
  */
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var syncList: LinearLayout
     private lateinit var emptyState: LinearLayout
     private lateinit var syncCount: TextView
+    private lateinit var logText: TextView
+    private lateinit var logScroll: ScrollView
 
     private val handler = Handler(Looper.getMainLooper())
     private val syncRecords = mutableListOf<SyncRecord>()
@@ -77,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         bindViews()
         setupListeners()
+        setupDebugLog()
 
         // 初始状态
         updateConnectionUI("DISCONNECTED", "", "")
@@ -115,6 +120,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        DebugLog.onNewLog = null
         handler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
@@ -129,12 +135,33 @@ class MainActivity : AppCompatActivity() {
         syncList = findViewById(R.id.sync_list)
         emptyState = findViewById(R.id.empty_state)
         syncCount = findViewById(R.id.sync_count)
+        logText = findViewById(R.id.log_text)
+        logScroll = findViewById(R.id.log_scroll)
     }
 
     private fun setupListeners() {
         findViewById<FrameLayout>(R.id.btn_settings).setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
+
+        findViewById<TextView>(R.id.btn_clear_logs).setOnClickListener {
+            DebugLog.clear()
+            logText.text = ""
+        }
+    }
+
+    private fun setupDebugLog() {
+        // 显示已有日志
+        logText.text = DebugLog.getAll()
+
+        // 监听新日志
+        DebugLog.onNewLog = { line ->
+            logText.append(line + "\n")
+            logScroll.post { logScroll.fullScroll(View.FOCUS_DOWN) }
+        }
+
+        // 初始滚动到底部
+        logScroll.post { logScroll.fullScroll(View.FOCUS_DOWN) }
     }
 
     private fun readClipboard(source: String) {

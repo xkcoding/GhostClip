@@ -14,11 +14,27 @@ use network::{ConnectionState, NetworkConfig, NetworkManager};
 use settings::Settings;
 use std::sync::{
     atomic::{AtomicIsize, AtomicU64, Ordering},
-    Arc, Mutex as StdMutex,
+    Arc, Mutex as StdMutex, OnceLock,
 };
 
 /// 记录弹出面板最后隐藏的时间戳（毫秒），用于 toggle 判断
 static LAST_POPUP_HIDE_MS: AtomicU64 = AtomicU64::new(0);
+
+/// 全局 AppHandle，供 debug_log 在任意位置发送日志到前端
+static APP_HANDLE: OnceLock<tauri::AppHandle> = OnceLock::new();
+
+/// 同时输出到 env_logger 和 Tauri 前端的调试日志
+pub(crate) fn debug_log(msg: &str) {
+    log::info!("{}", msg);
+    if let Some(app) = APP_HANDLE.get() {
+        let _ = app.emit(
+            "debug-log",
+            serde_json::json!({
+                "message": msg,
+            }),
+        );
+    }
+}
 use tauri::{
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     Emitter, Manager, WebviewWindowBuilder,
@@ -166,12 +182,12 @@ fn trigger_send(app: &tauri::AppHandle) {
     if let Some(text) = read_clipboard() {
         match state.hash_pool.check_and_insert(&text) {
             Some(hash) => {
-                log::info!(
+                debug_log(&format!(
                     "发送剪贴板 - 哈希: {}, 长度: {}, 前50字符: {}",
                     hash,
                     text.len(),
                     &text[..text.len().min(50)]
-                );
+                ));
 
                 // 发射 clip-synced 事件到前端
                 let _ = app.emit(
@@ -357,7 +373,7 @@ fn start_network(app_handle: tauri::AppHandle) {
                     let mut net_guard = network_state.lock().await;
                     *net_guard = Some(net.clone());
                 }
-                log::info!("网络服务已启动");
+                debug_log("网络服务已启动");
                 emit_connection_state(&app_handle, conn_state);
 
                 // 监听云端错误：auth 失败时切换到 Disconnected + 通知前端
@@ -385,7 +401,7 @@ fn start_network(app_handle: tauri::AppHandle) {
                 tokio::spawn(async move {
                     while state_rx.changed().await.is_ok() {
                         let new_state = *state_rx.borrow();
-                        log::info!("连接状态变更: {}", new_state);
+                        debug_log(&format!("连接状态变更: {}", new_state));
                         emit_connection_state(&app_for_state, new_state);
                     }
                 });
@@ -410,10 +426,10 @@ fn start_network(app_handle: tauri::AppHandle) {
                 state
                     .last_change_count
                     .store(get_change_count(), Ordering::Relaxed);
-                log::info!(
+                debug_log(&format!(
                     "远端剪贴板已写入本地, 前50字符: {}",
                     &text[..text.len().min(50)]
-                );
+                ));
 
                 // 发射 clip-synced 事件
                 let _ = app_handle.emit(
@@ -565,6 +581,9 @@ pub fn run() {
         .manage(state)
         .plugin(tauri_plugin_notification::init())
         .setup(move |app| {
+            // 保存全局 AppHandle
+            APP_HANDLE.set(app.handle().clone()).ok();
+
             // 注册全局快捷键插件（必须在 setup 内通过 handle 注册，避免 config 反序列化问题）
             use tauri_plugin_global_shortcut::GlobalShortcutExt;
             app.handle().plugin(
