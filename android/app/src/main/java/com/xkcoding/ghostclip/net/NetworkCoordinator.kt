@@ -146,8 +146,10 @@ class NetworkCoordinator(
 
             override fun onClipReceived(content: String, hash: String, deviceId: String) {
                 if (!hashPool.checkAndRecord(content)) {
-                    ClipboardHelper.write(context, content)
                     DebugLog.d(TAG, "LAN 收到剪贴板: hash=$hash, len=${content.length}")
+                    // Android 10+ 后台写剪贴板会静默失败，存为 pending 等前台写入
+                    pendingClip = content
+                    ClipboardHelper.write(context, content)
                     broadcastClipSynced(content, "incoming", connectedMacName.ifEmpty { "Mac" })
                 } else {
                     DebugLog.d(TAG, "LAN 收到重复内容, 跳过: hash=$hash")
@@ -183,8 +185,9 @@ class NetworkCoordinator(
 
                 override fun onNewClip(record: CloudClient.ClipRecord) {
                     if (!hashPool.checkAndRecord(record.text)) {
-                        ClipboardHelper.write(context, record.text)
                         DebugLog.d(TAG, "云端收到剪贴板: len=${record.text.length}")
+                        pendingClip = record.text
+                        ClipboardHelper.write(context, record.text)
                         broadcastClipSynced(record.text, "incoming", "Mac (Cloud)")
                     }
                 }
@@ -326,9 +329,22 @@ class NetworkCoordinator(
         @Volatile
         var lastState: GhostClipService.ConnectionState = GhostClipService.ConnectionState.DISCONNECTED
             private set
+        @Volatile
         var lastDeviceName: String = ""
             private set
+        @Volatile
         var lastConnLabel: String = ""
             private set
+
+        /** 后台收到的剪贴板内容，等前台 Activity 写入 */
+        @Volatile
+        var pendingClip: String? = null
+
+        /** 消费 pending clip（前台 Activity 调用后清空） */
+        fun consumePendingClip(): String? {
+            val clip = pendingClip
+            pendingClip = null
+            return clip
+        }
     }
 }

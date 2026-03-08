@@ -34,11 +34,18 @@ object ClipboardHelper {
 
     /**
      * 写入剪贴板（接收远端内容时调用）
+     * 注意: Android 10+ 后台 Service 调用会静默失败，需要在前台 Activity 中调用
      */
-    fun write(context: Context, text: String) {
-        val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("GhostClip", text)
-        cm.setPrimaryClip(clip)
-        DebugLog.d(TAG, "写入剪贴板: ${text.take(80)}")
+    fun write(context: Context, text: String): Boolean {
+        return try {
+            val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("GhostClip", text)
+            cm.setPrimaryClip(clip)
+            DebugLog.d(TAG, "写入剪贴板: ${text.take(80)}")
+            true
+        } catch (e: Exception) {
+            DebugLog.e(TAG, "写入剪贴板失败(可能后台限制): ${e.message}")
+            false
+        }
     }
 }

@@ -54,12 +54,14 @@ class MainActivity : AppCompatActivity() {
                     val stateName = intent.getStringExtra("state") ?: return
                     val device = intent.getStringExtra("device_name") ?: ""
                     val connLabel = intent.getStringExtra("conn_label") ?: ""
+                    DebugLog.d(TAG, "收到连接广播: state=$stateName, device=$device")
                     updateConnectionUI(stateName, device, connLabel)
                 }
                 ACTION_CLIP_SYNCED -> {
                     val text = intent.getStringExtra("text") ?: return
                     val direction = intent.getStringExtra("direction") ?: "incoming"
                     val source = intent.getStringExtra("source") ?: "Android"
+                    DebugLog.d(TAG, "收到同步广播: dir=$direction, source=$source, len=${text.length}")
                     addSyncRecord(text, direction, source)
                 }
             }
@@ -90,7 +92,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        handler.postDelayed({ readClipboard("onResume") }, 200)
+        DebugLog.d(TAG, "onResume")
 
         // 首次启动检测电池优化引导 (每次 Activity 生命周期只弹一次)
         if (!batteryGuideShown && BatteryGuideActivity.shouldShow(this)) {
@@ -108,11 +110,18 @@ class MainActivity : AppCompatActivity() {
         )
 
         // 主动查询当前连接状态（补偿注册前可能错过的广播）
-        updateConnectionUI(
-            NetworkCoordinator.lastState.name,
-            NetworkCoordinator.lastDeviceName,
-            NetworkCoordinator.lastConnLabel
-        )
+        val state = NetworkCoordinator.lastState
+        DebugLog.d(TAG, "查询连接状态: ${state.name}, device=${NetworkCoordinator.lastDeviceName}")
+        updateConnectionUI(state.name, NetworkCoordinator.lastDeviceName, NetworkCoordinator.lastConnLabel)
+
+        // 检查后台收到的远端剪贴板（Android 10+ 后台无法写入剪贴板，在前台补写）
+        NetworkCoordinator.consumePendingClip()?.let { text ->
+            DebugLog.d(TAG, "前台写入 pending 远端剪贴板: ${text.take(80)}")
+            ClipboardHelper.write(this, text)
+        }
+
+        // 延迟读取剪贴板（等待 window focus）
+        handler.postDelayed({ readClipboard("onResume") }, 300)
     }
 
     override fun onPause() {
@@ -123,6 +132,14 @@ class MainActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
+            DebugLog.d(TAG, "onWindowFocusChanged: hasFocus=true")
+
+            // 再次检查 pending clip（window focus 后写剪贴板更可靠）
+            NetworkCoordinator.consumePendingClip()?.let { text ->
+                DebugLog.d(TAG, "focus 时写入 pending 远端剪贴板: ${text.take(80)}")
+                ClipboardHelper.write(this, text)
+            }
+
             handler.postDelayed({ readClipboard("onFocus") }, 100)
         }
     }
@@ -193,6 +210,7 @@ class MainActivity : AppCompatActivity() {
      * 更新连接状态 UI
      */
     private fun updateConnectionUI(stateName: String, device: String, connLabel: String) {
+        DebugLog.d(TAG, "UI 更新连接状态: $stateName")
         when (stateName) {
             "LAN" -> {
                 statusCard.setBackgroundResource(R.drawable.bg_status_card_connected)
