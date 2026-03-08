@@ -114,6 +114,20 @@ class MainActivity : AppCompatActivity() {
         DebugLog.d(TAG, "查询连接状态: ${state.name}, device=${NetworkCoordinator.lastDeviceName}")
         updateConnectionUI(state.name, NetworkCoordinator.lastDeviceName, NetworkCoordinator.lastConnLabel)
 
+        // 消费缓存的同步记录（补偿 Activity 不在前台时丢失的广播）
+        val pendingRecords = NetworkCoordinator.consumePendingSyncRecords()
+        if (pendingRecords.isNotEmpty()) {
+            DebugLog.d(TAG, "恢复 ${pendingRecords.size} 条同步记录")
+            syncRecords.clear()
+            for (record in pendingRecords) {
+                syncRecords.add(SyncRecord(record.text, record.direction, record.source, System.currentTimeMillis()))
+            }
+            if (syncRecords.size > 20) {
+                while (syncRecords.size > 20) syncRecords.removeAt(0)
+            }
+            refreshSyncList()
+        }
+
         // 检查后台收到的远端剪贴板（Android 10+ 后台无法写入剪贴板，在前台补写）
         NetworkCoordinator.consumePendingClip()?.let { text ->
             DebugLog.d(TAG, "前台写入 pending 远端剪贴板: ${text.take(80)}")

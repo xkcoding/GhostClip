@@ -282,6 +282,8 @@ class NetworkCoordinator(
      * 广播同步事件给 UI -- 显示同步记录
      */
     private fun broadcastClipSynced(text: String, direction: String, source: String) {
+        // 始终缓存同步记录（onResume 时消费，补偿 Activity 不在前台时丢失的广播）
+        addPendingSyncRecord(text, direction, source)
         context.sendBroadcast(Intent(MainActivity.ACTION_CLIP_SYNCED).apply {
             setPackage(context.packageName)
             putExtra("text", text)
@@ -345,6 +347,28 @@ class NetworkCoordinator(
         /** 最近一次从远端接收的剪贴板内容（防止 echo 回传） */
         @Volatile
         var lastReceivedClip: String? = null
+
+        /** 后台积累的同步记录，前台 Activity 回来时消费显示 */
+        private val pendingSyncRecords = mutableListOf<SyncRecord>()
+
+        data class SyncRecord(val text: String, val direction: String, val source: String)
+
+        fun addPendingSyncRecord(text: String, direction: String, source: String) {
+            synchronized(pendingSyncRecords) {
+                pendingSyncRecords.add(SyncRecord(text, direction, source))
+                // 最多缓存 20 条
+                if (pendingSyncRecords.size > 20) pendingSyncRecords.removeAt(0)
+            }
+        }
+
+        /** 消费所有 pending 同步记录（前台 Activity 调用后清空） */
+        fun consumePendingSyncRecords(): List<SyncRecord> {
+            synchronized(pendingSyncRecords) {
+                val copy = pendingSyncRecords.toList()
+                pendingSyncRecords.clear()
+                return copy
+            }
+        }
 
         /** 消费 pending clip（前台 Activity 调用后清空） */
         fun consumePendingClip(): String? {
