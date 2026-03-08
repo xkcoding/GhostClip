@@ -251,6 +251,11 @@ class NetworkCoordinator(
             }
         }
 
+        // 缓存最新状态
+        lastState = state
+        lastDeviceName = deviceLabel
+        lastConnLabel = connLabel
+
         DebugLog.d(TAG, "连接状态更新: ${state.name}")
 
         // 更新通知栏
@@ -316,5 +321,14 @@ class NetworkCoordinator(
 
     companion object {
         private const val TAG = "NetCoordinator"
+
+        /** 最后的连接状态，供 MainActivity 在 onResume 时查询（补偿错过的广播） */
+        @Volatile
+        var lastState: GhostClipService.ConnectionState = GhostClipService.ConnectionState.DISCONNECTED
+            private set
+        var lastDeviceName: String = ""
+            private set
+        var lastConnLabel: String = ""
+            private set
     }
 }

@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import com.xkcoding.ghostclip.R
 import com.xkcoding.ghostclip.clip.ClipboardHelper
 import com.xkcoding.ghostclip.clip.SyncBridge
+import com.xkcoding.ghostclip.net.NetworkCoordinator
 import com.xkcoding.ghostclip.service.GhostClipService
 import com.xkcoding.ghostclip.util.DebugLog
 
@@ -105,6 +106,13 @@ class MainActivity : AppCompatActivity() {
         ContextCompat.registerReceiver(
             this, stateReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED
         )
+
+        // 主动查询当前连接状态（补偿注册前可能错过的广播）
+        updateConnectionUI(
+            NetworkCoordinator.lastState.name,
+            NetworkCoordinator.lastDeviceName,
+            NetworkCoordinator.lastConnLabel
+        )
     }
 
     override fun onPause() {
@@ -165,10 +173,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun readClipboard(source: String) {
-        val text = ClipboardHelper.read(this) ?: return
-        if (text.isBlank()) return
-        // 自动发送场景由 QuickSyncActivity 处理
-        // 这里仅展示当前剪贴板内容已读取
+        val text = ClipboardHelper.read(this)
+        if (text.isNullOrBlank()) {
+            DebugLog.d(TAG, "[$source] 剪贴板为空")
+            return
+        }
+        DebugLog.d(TAG, "[$source] 读取剪贴板: ${text.take(80)}")
+
+        // 前台自动发送
+        val sent = SyncBridge.sendClip(text, GhostClipService.hashPool, this)
+        if (sent) {
+            DebugLog.d(TAG, "[$source] 已投递同步")
+        } else {
+            DebugLog.d(TAG, "[$source] 未发送(重复或服务未就绪)")
+        }
     }
 
     /**
@@ -295,6 +313,7 @@ class MainActivity : AppCompatActivity() {
     )
 
     companion object {
+        private const val TAG = "MainActivity"
         const val EXTRA_AUTO_SYNC = "auto_sync"
         const val ACTION_CONNECTION_CHANGED = "com.xkcoding.ghostclip.CONNECTION_CHANGED"
         const val ACTION_CLIP_SYNCED = "com.xkcoding.ghostclip.CLIP_SYNCED"
