@@ -69,7 +69,7 @@ class NsdDiscovery(context: Context) {
         }
     }
 
-    private fun resolveListener(retryCount: Int = 0) = object : NsdManager.ResolveListener {
+    private fun resolveListener(retryCount: Int = 0): NsdManager.ResolveListener = object : NsdManager.ResolveListener {
         override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
             DebugLog.e(TAG, "解析 ${serviceInfo.serviceName} 失败: errorCode=$errorCode (retry=$retryCount)")
             // 解析失败时重试（最多 2 次），常见于 Android NSD 内部竞争
