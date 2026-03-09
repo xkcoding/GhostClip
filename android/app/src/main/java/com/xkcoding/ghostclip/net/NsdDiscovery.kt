@@ -69,9 +69,18 @@ class NsdDiscovery(context: Context) {
         }
     }
 
-    private fun resolveListener() = object : NsdManager.ResolveListener {
+    private fun resolveListener(retryCount: Int = 0) = object : NsdManager.ResolveListener {
         override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
-            DebugLog.e(TAG, "解析 ${serviceInfo.serviceName} 失败: errorCode=$errorCode")
+            DebugLog.e(TAG, "解析 ${serviceInfo.serviceName} 失败: errorCode=$errorCode (retry=$retryCount)")
+            // 解析失败时重试（最多 2 次），常见于 Android NSD 内部竞争
+            if (retryCount < MAX_RESOLVE_RETRIES) {
+                DebugLog.d(TAG, "重试解析 ${serviceInfo.serviceName} ...")
+                try {
+                    nsdManager.resolveService(serviceInfo, resolveListener(retryCount + 1))
+                } catch (e: Exception) {
+                    DebugLog.e(TAG, "重试解析异常: ${e.message}")
+                }
+            }
         }
 
         override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
@@ -131,5 +140,6 @@ class NsdDiscovery(context: Context) {
     companion object {
         private const val TAG = "NsdDiscovery"
         const val SERVICE_TYPE = "_ghostclip._tcp."
+        private const val MAX_RESOLVE_RETRIES = 2
     }
 }

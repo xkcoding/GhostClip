@@ -15,7 +15,10 @@ import com.xkcoding.ghostclip.ui.MainActivity
 import com.xkcoding.ghostclip.util.DebugLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
@@ -37,6 +40,7 @@ class NetworkCoordinator(
     private var presenceSM: PresenceStateMachine? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var multicastLock: WifiManager.MulticastLock? = null
+    private var nsdRefreshJob: Job? = null
 
     // 记录当前连接的 Mac 服务名
     private var connectedMacName: String = ""
@@ -75,6 +79,8 @@ class NetworkCoordinator(
                     // 回退云端
                     val cloud = cloudClient
                     if (cloud != null) {
+                        // 发送时顺便注册，确保对端 IDLE 检查能发现自己
+                        cloud.register()
                         val ok = cloud.postClip(text, hash)
                         DebugLog.d(TAG, "云端发送 ${if (ok) "成功" else "失败"} (hash=$hash)")
                         if (ok) broadcastClipSynced(text, "outgoing", "Mac (Cloud)")
@@ -96,11 +102,16 @@ class NetworkCoordinator(
 
         // 3. WiFi 变化监听 -> 重新 mDNS 发现
         registerNetworkCallback()
+
+        // 4. 周期性 NSD 刷新 -- 未连接时每 60s 重启 mDNS 发现（应对 NSD 静默失效）
+        startNsdRefreshLoop()
     }
 
     fun stop() {
         DebugLog.d(TAG, "NetworkCoordinator 停止")
         SyncBridge.callback = null
+        nsdRefreshJob?.cancel()
+        nsdRefreshJob = null
         nsdDiscovery?.stopDiscovery()
         lanClient?.shutdown()
         cloudClient?.shutdown()
@@ -158,8 +169,32 @@ class NetworkCoordinator(
                     DebugLog.d(TAG, "LAN 收到重复内容, 跳过: hash=$hash")
                 }
             }
+
+            override fun onReconnectExhausted() {
+                DebugLog.w(TAG, "LAN 重连耗尽 -> 重新启动 mDNS 发现")
+                connectedMacName = ""
+                updateServiceState()
+                nsdDiscovery?.restartDiscovery()
+            }
         }
         lanClient!!.connect(host, port)
+    }
+
+    /**
+     * 周期性 NSD 刷新 -- 未连接时每 60s 重启 mDNS 发现
+     * Android NSD 可能静默失效（不触发任何回调），定时重启可以恢复
+     */
+    private fun startNsdRefreshLoop() {
+        nsdRefreshJob?.cancel()
+        nsdRefreshJob = scope.launch {
+            while (isActive) {
+                delay(NSD_REFRESH_INTERVAL_MS)
+                if (lanClient?.isConnected != true) {
+                    DebugLog.d(TAG, "NSD 定时刷新: LAN 未连接, 重启 mDNS 发现")
+                    nsdDiscovery?.restartDiscovery()
+                }
+            }
+        }
     }
 
     private fun setupCloudSync() {
@@ -330,6 +365,7 @@ class NetworkCoordinator(
 
     companion object {
         private const val TAG = "NetCoordinator"
+        private const val NSD_REFRESH_INTERVAL_MS = 60_000L
 
         /** 最后的连接状态，供 MainActivity 在 onResume 时查询（补偿错过的广播） */
         @Volatile

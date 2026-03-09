@@ -13,6 +13,7 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import org.json.JSONObject
+import java.net.Proxy
 import java.util.concurrent.TimeUnit
 
 /**
@@ -32,11 +33,14 @@ class LanClient(
         fun onConnected()
         fun onDisconnected()
         fun onClipReceived(content: String, hash: String, deviceId: String)
+        /** 连续多次重连失败，建议重新进行 NSD 发现 */
+        fun onReconnectExhausted() {}
     }
 
     var listener: Listener? = null
 
     private val client = OkHttpClient.Builder()
+        .proxy(Proxy.NO_PROXY) // 局域网直连，绕过系统代理
         .connectTimeout(5, TimeUnit.SECONDS)
         .readTimeout(0, TimeUnit.MINUTES) // WebSocket 长连接
         .pingInterval(30, TimeUnit.SECONDS)
@@ -46,6 +50,7 @@ class LanClient(
     private var reconnectJob: Job? = null
     private var currentHost: String? = null
     private var currentPort: Int = 0
+    private var reconnectFailCount = 0
 
     @Volatile
     var isConnected = false
@@ -67,6 +72,7 @@ class LanClient(
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 DebugLog.d(TAG, "WebSocket 已连接 -> $url")
                 isConnected = true
+                reconnectFailCount = 0
                 listener?.onConnected()
             }
 
@@ -126,15 +132,22 @@ class LanClient(
     }
 
     /**
-     * 断线重连 -- 3s 后重试
+     * 断线重连 -- 3s 后重试，连续失败 MAX_RECONNECT_ATTEMPTS 次后通知上层刷新 NSD
      */
     private fun scheduleReconnect() {
         reconnectJob?.cancel()
+        reconnectFailCount++
+        if (reconnectFailCount > MAX_RECONNECT_ATTEMPTS) {
+            DebugLog.w(TAG, "连续 $reconnectFailCount 次重连失败，通知上层刷新 NSD")
+            reconnectFailCount = 0
+            listener?.onReconnectExhausted()
+            return
+        }
         reconnectJob = scope.launch(Dispatchers.IO) {
             delay(RECONNECT_DELAY_MS)
             if (!isActive) return@launch
             val host = currentHost ?: return@launch
-            DebugLog.d(TAG, "重连 WebSocket -> $host:$currentPort ...")
+            DebugLog.d(TAG, "重连 WebSocket ($reconnectFailCount/$MAX_RECONNECT_ATTEMPTS) -> $host:$currentPort ...")
             connect(host, currentPort)
         }
     }
@@ -148,5 +161,6 @@ class LanClient(
     companion object {
         private const val TAG = "LanClient"
         private const val RECONNECT_DELAY_MS = 3_000L
+        private const val MAX_RECONNECT_ATTEMPTS = 3
     }
 }
