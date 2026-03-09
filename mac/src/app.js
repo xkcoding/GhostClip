@@ -438,7 +438,16 @@ async function loadSettings() {
   }
 }
 
+let _saveSettingsTimer = null;
+
 async function saveSettings() {
+  // 防抖：300ms 内多次调用只执行最后一次，防止连续触发网络重启
+  if (_saveSettingsTimer) clearTimeout(_saveSettingsTimer);
+  _saveSettingsTimer = setTimeout(() => _doSaveSettings(), 300);
+}
+
+async function _doSaveSettings() {
+  _saveSettingsTimer = null;
   const data = { ...state.settings };
   state.settingsError = '';
   try {

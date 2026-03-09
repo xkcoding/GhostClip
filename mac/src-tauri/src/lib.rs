@@ -17,6 +17,9 @@ use std::sync::{
     Arc, Mutex as StdMutex, OnceLock,
 };
 
+/// 网络重启防抖代数计数器，防止连续多次快速重启
+static NETWORK_RESTART_GEN: AtomicU64 = AtomicU64::new(0);
+
 /// 记录弹出面板最后隐藏的时间戳（毫秒），用于 toggle 判断
 static LAST_POPUP_HIDE_MS: AtomicU64 = AtomicU64::new(0);
 
@@ -197,12 +200,19 @@ fn cmd_save_settings(app: tauri::AppHandle, settings: String) -> Result<(), Stri
     settings::save_settings(&parsed)?;
     log::info!("设置已保存");
 
-    // 云端配置变更时重建网络
+    // 云端配置变更时重建网络（500ms 防抖，避免连续快速重启）
     if need_network_reinit {
-        log::info!("云端配置已变更，重新初始化网络...");
+        let gen = NETWORK_RESTART_GEN.fetch_add(1, Ordering::SeqCst) + 1;
+        log::info!("云端配置已变更，计划重建网络 (gen={})...", gen);
         let network = state.network.clone();
         let app_handle = app.clone();
         tauri::async_runtime::spawn(async move {
+            // 防抖等待：500ms 内若有新的重启请求，本次作废
+            tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+            if NETWORK_RESTART_GEN.load(Ordering::SeqCst) != gen {
+                log::info!("网络重启已被更新的请求覆盖 (gen={}), 跳过", gen);
+                return;
+            }
             // 先关闭旧的 NetworkManager（abort 后台任务释放端口）
             {
                 let mut net_guard = network.lock().await;

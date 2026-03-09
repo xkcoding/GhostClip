@@ -42,8 +42,10 @@ class NetworkCoordinator(
     private var multicastLock: WifiManager.MulticastLock? = null
     private var nsdRefreshJob: Job? = null
 
-    // 记录当前连接的 Mac 服务名
+    // 记录当前连接的 Mac 服务信息
     private var connectedMacName: String = ""
+    private var connectedHost: String = ""
+    private var connectedPort: Int = 0
 
     private val prefs by lazy {
         context.getSharedPreferences("ghostclip_settings", Context.MODE_PRIVATE)
@@ -124,14 +126,23 @@ class NetworkCoordinator(
         nsdDiscovery = NsdDiscovery(context).apply {
             listener = object : NsdDiscovery.Listener {
                 override fun onServiceFound(host: String, port: Int, serviceName: String) {
+                    // 已连接到相同目标时跳过，避免重复服务发现导致连接抖动
+                    if (lanClient?.isConnected == true && host == connectedHost && port == connectedPort) {
+                        DebugLog.d(TAG, "已连接到 $serviceName @ $host:$port, 跳过重复发现")
+                        return
+                    }
                     DebugLog.d(TAG, "发现 Mac 服务: $serviceName @ $host:$port")
                     connectedMacName = serviceName
+                    connectedHost = host
+                    connectedPort = port
                     connectLan(host, port)
                 }
 
                 override fun onServiceLost(serviceName: String) {
                     DebugLog.d(TAG, "Mac 服务丢失: $serviceName")
                     connectedMacName = ""
+                    connectedHost = ""
+                    connectedPort = 0
                     lanClient?.disconnect()
                     updateServiceState()
                 }
@@ -173,6 +184,8 @@ class NetworkCoordinator(
             override fun onReconnectExhausted() {
                 DebugLog.w(TAG, "LAN 重连耗尽 -> 重新启动 mDNS 发现")
                 connectedMacName = ""
+                connectedHost = ""
+                connectedPort = 0
                 updateServiceState()
                 nsdDiscovery?.restartDiscovery()
             }
@@ -244,6 +257,11 @@ class NetworkCoordinator(
 
         networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
+                // LAN 已连接时跳过 NSD 重启，避免中断正常连接
+                if (lanClient?.isConnected == true) {
+                    DebugLog.d(TAG, "WiFi 事件触发但 LAN 已连接, 跳过 NSD 重启")
+                    return
+                }
                 DebugLog.d(TAG, "WiFi 连接 -- 重新启动 mDNS 发现")
                 nsdDiscovery?.restartDiscovery()
             }
@@ -251,6 +269,8 @@ class NetworkCoordinator(
             override fun onLost(network: Network) {
                 DebugLog.d(TAG, "WiFi 断开 -- LAN 不可用")
                 connectedMacName = ""
+                connectedHost = ""
+                connectedPort = 0
                 lanClient?.disconnect()
                 updateServiceState()
             }
@@ -365,7 +385,7 @@ class NetworkCoordinator(
 
     companion object {
         private const val TAG = "NetCoordinator"
-        private const val NSD_REFRESH_INTERVAL_MS = 60_000L
+        private const val NSD_REFRESH_INTERVAL_MS = 30_000L
 
         /** 最后的连接状态，供 MainActivity 在 onResume 时查询（补偿错过的广播） */
         @Volatile

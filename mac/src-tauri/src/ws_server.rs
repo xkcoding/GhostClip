@@ -217,9 +217,28 @@ async fn handle_connection(
     });
 
     let write_task = tokio::spawn(async move {
-        while let Ok(msg) = rx.recv().await {
-            if ws_sender.send(Message::Text(msg.into())).await.is_err() {
-                break;
+        let mut ping_interval = tokio::time::interval(std::time::Duration::from_secs(30));
+        ping_interval.tick().await; // 跳过第一次立即触发
+        loop {
+            tokio::select! {
+                msg = rx.recv() => {
+                    match msg {
+                        Ok(msg) => {
+                            if ws_sender.send(Message::Text(msg.into())).await.is_err() {
+                                break;
+                            }
+                        }
+                        Err(tokio::sync::broadcast::error::RecvError::Lagged(_)) => continue,
+                        Err(_) => break,
+                    }
+                }
+                _ = ping_interval.tick() => {
+                    // 服务端主动 Ping，检测死连接
+                    if ws_sender.send(Message::Ping(vec![].into())).await.is_err() {
+                        log::info!("WebSocket Ping 发送失败, 连接可能已断开: {}", addr);
+                        break;
+                    }
+                }
             }
         }
     });
