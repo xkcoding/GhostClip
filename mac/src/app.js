@@ -248,30 +248,7 @@ function renderSettings() {
         </div>
         <div class="settings-divider"></div>
 
-        <!-- Cloud Sync Section -->
-        <div class="settings-section cloud">
-          <span class="settings-section-label">\u4E91\u7AEF\u540C\u6B65</span>
-          <div class="field-group">
-            <label class="field-label">\u4E91\u7AEF\u5730\u5740</label>
-            <input class="field-input" type="text" id="cloud-url"
-                   placeholder="ghostclip.xkcoding.com"
-                   value="${escapeHtml(state.settings.cloudUrl)}" />
-          </div>
-          <div class="field-group">
-            <label class="field-label">Token</label>
-            <input class="field-input" type="password" id="cloud-token"
-                   placeholder="\u8F93\u5165 Token"
-                   value="${escapeHtml(state.settings.cloudToken)}" />
-          </div>
-          <div class="toggle-row">
-            <span class="toggle-label">\u542F\u7528\u4E91\u7AEF\u540C\u6B65</span>
-            <div class="toggle-track ${cloudToggleClass}" data-action="toggle-cloud">
-              <div class="toggle-thumb"></div>
-            </div>
-          </div>
-          ${settingsErrorHtml}
-        </div>
-        <div class="settings-divider"></div>
+        <!-- Cloud Sync Section (暂时隐藏，后续启用 Durable Objects 时恢复) -->
 
         <!-- Notifications Section -->
         <div class="settings-section">
@@ -623,13 +600,10 @@ function formatTimeAgo(timestamp) {
 async function init() {
   await loadSettings();
 
-  // 根据窗口 label 自动选择视图
-  try {
-    const label = window.__TAURI__?.window?.getCurrentWindow()?.label;
-    if (label === 'settings') {
-      state.currentView = 'settings';
-    }
-  } catch (_) { /* ignore */ }
+  // 根据 URL hash 自动选择视图（Rust 端打开设置窗口时传入 #settings）
+  if (window.location.hash === '#settings') {
+    state.currentView = 'settings';
+  }
 
   render();
   attachEventListeners();

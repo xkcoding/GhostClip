@@ -63,8 +63,8 @@ impl WsServer {
         }
     }
 
-    /// 启动 WebSocket 服务器，返回实际绑定的端口
-    pub async fn start(&self) -> Result<u16, String> {
+    /// 启动 WebSocket 服务器，返回 (实际端口, 监听任务 Handle)
+    pub async fn start(&self) -> Result<(u16, tokio::task::JoinHandle<()>), String> {
         let addr = format!("0.0.0.0:{}", self.port);
         let listener = TcpListener::bind(&addr)
             .await
@@ -82,7 +82,7 @@ impl WsServer {
         let incoming_tx = self.incoming_tx.clone();
         let conn_event_tx = self.conn_event_tx.clone();
 
-        tokio::spawn(async move {
+        let handle = tokio::spawn(async move {
             loop {
                 match listener.accept().await {
                     Ok((stream, addr)) => {
@@ -107,7 +107,7 @@ impl WsServer {
             }
         });
 
-        Ok(local_port)
+        Ok((local_port, handle))
     }
 
     /// 向所有连接的客户端广播消息

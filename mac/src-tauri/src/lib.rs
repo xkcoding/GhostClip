@@ -203,11 +203,16 @@ fn cmd_save_settings(app: tauri::AppHandle, settings: String) -> Result<(), Stri
         let network = state.network.clone();
         let app_handle = app.clone();
         tauri::async_runtime::spawn(async move {
-            // 先释放旧的 NetworkManager
+            // 先关闭旧的 NetworkManager（abort 后台任务释放端口）
             {
                 let mut net_guard = network.lock().await;
+                if let Some(ref net) = *net_guard {
+                    net.shutdown();
+                }
                 *net_guard = None;
             }
+            // 等待端口释放
+            tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
             // 重新启动网络
             start_network(app_handle);
         });
@@ -589,7 +594,7 @@ fn show_settings_window(app: &tauri::AppHandle) {
         return;
     }
     // 创建新的设置窗口
-    match WebviewWindowBuilder::new(app, "settings", tauri::WebviewUrl::App("index.html".into()))
+    match WebviewWindowBuilder::new(app, "settings", tauri::WebviewUrl::App("index.html#settings".into()))
         .title("GhostClip 设置")
         .inner_size(480.0, 600.0)
         .resizable(false)

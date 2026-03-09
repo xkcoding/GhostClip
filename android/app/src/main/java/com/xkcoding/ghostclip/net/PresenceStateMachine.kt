@@ -111,8 +111,8 @@ class PresenceStateMachine(
 
     companion object {
         private const val TAG = "PresenceSM"
-        private const val IDLE_CHECK_INTERVAL_MS = 30_000L
-        private const val POLL_INTERVAL_MS = 3_000L
+        private const val IDLE_CHECK_INTERVAL_MS = 10_000L
+        private const val POLL_INTERVAL_MS = 2_000L
         private const val HEARTBEAT_INTERVAL_MS = 10 * 60 * 1_000L // 10 min
     }
 }
