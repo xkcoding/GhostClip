@@ -1,4 +1,5 @@
 IMPORTANT: Never enter PLAN mode unless I explicitly requested!
+IMPORTANT: Never build or package locally. All builds run via CI (GitHub Actions). After pushing, monitor with `gh run watch`, then download artifacts to `artifacts/` via `gh run download`.
 
 # GhostClip
 

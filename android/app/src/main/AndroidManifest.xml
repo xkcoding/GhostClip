@@ -9,6 +9,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
         android:allowBackup="false"
@@ -50,6 +53,12 @@
             android:name=".ui.BatteryGuideActivity"
             android:exported="false" />
 
+        <!-- 扫码配对 -->
+        <activity
+            android:name=".ui.ScanActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- 设置界面 -->
         <activity
             android:name=".ui.SettingsActivity"
@@ -64,6 +73,11 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="clipboard_sync" />
         </service>
+
+        <!-- 通知复制按钮接收器 -->
+        <receiver
+            android:name=".service.GhostClipService$CopyReceiver"
+            android:exported="false" />
 
     </application>
 

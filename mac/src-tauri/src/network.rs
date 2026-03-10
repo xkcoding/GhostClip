@@ -1,6 +1,7 @@
 use crate::cloud_client::{CloudClient, CloudError, ClipRecord};
 use crate::hash_pool::{md5_hash, HashPool};
 use crate::mdns::MdnsService;
+use crate::pairing::PairingManager;
 use crate::presence::{PresenceMode, PresenceStateMachine};
 use crate::ws_server::{ClipMessage, WsConnectionEvent, WsServer};
 use std::sync::Arc;
@@ -34,6 +35,7 @@ pub struct NetworkManager {
     cloud_client: Option<Arc<CloudClient>>,
     presence: Arc<PresenceStateMachine>,
     hash_pool: Arc<HashPool>,
+    pairing: Arc<PairingManager>,
     _mdns: Option<MdnsService>,
     has_cloud: bool,
     state_tx: watch::Sender<ConnectionState>,
@@ -48,6 +50,7 @@ pub struct NetworkConfig {
     pub cloud_url: Option<String>,
     pub cloud_token: Option<String>,
     pub device_id: String,
+    pub pairing: Arc<PairingManager>,
 }
 
 impl NetworkManager {
@@ -62,13 +65,14 @@ impl NetworkManager {
         let (ws_incoming_tx, mut ws_incoming_rx) = mpsc::channel::<ClipMessage>(32);
         let (conn_event_tx, mut conn_event_rx) = mpsc::channel::<WsConnectionEvent>(32);
 
-        // 启动 WebSocket Server
-        let ws_server = Arc::new(WsServer::new(config.ws_port, ws_incoming_tx, conn_event_tx));
+        // 启动 WebSocket Server（带 token 鉴权）
+        let ws_server = Arc::new(WsServer::new(config.ws_port, config.pairing.clone(), ws_incoming_tx, conn_event_tx));
         let (actual_port, ws_handle) = ws_server.start().await?;
         let mut task_handles: Vec<tokio::task::JoinHandle<()>> = vec![ws_handle];
 
-        // 注册 mDNS 服务
-        let mdns = match MdnsService::register(actual_port, &config.device_id) {
+        // 注册 mDNS 服务（使用 mac_hash 作为实例标识）
+        let pairing = config.pairing.clone();
+        let mdns = match MdnsService::register(actual_port, pairing.mac_hash(), &config.device_id) {
             Ok(m) => {
                 log::info!("mDNS 服务注册成功");
                 Some(m)
@@ -186,6 +190,7 @@ impl NetworkManager {
             cloud_client,
             presence,
             hash_pool,
+            pairing,
             _mdns: mdns,
             has_cloud,
             state_tx,
@@ -206,6 +211,7 @@ impl NetworkManager {
         // 尝试局域网发送
         if self.ws_server.client_count().await > 0 {
             let msg = ClipMessage {
+                msg_type: "clip".to_string(),
                 device_id: device_id.to_string(),
                 text: text.to_string(),
                 hash: hash.clone(),
@@ -251,6 +257,16 @@ impl NetworkManager {
     /// 强制设置连接状态（用于错误恢复等场景）
     pub fn set_connection_state(&self, state: ConnectionState) {
         let _ = self.state_tx.send(state);
+    }
+
+    /// 获取配对管理器
+    pub fn pairing(&self) -> &Arc<PairingManager> {
+        &self.pairing
+    }
+
+    /// 向已配对设备发送 unpair 消息并断开连接
+    pub async fn send_unpair_and_disconnect(&self) {
+        self.ws_server.send_unpair_and_disconnect().await;
     }
 
     /// 获取当前 presence 模式

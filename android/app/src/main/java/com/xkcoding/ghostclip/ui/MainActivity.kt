@@ -1,6 +1,8 @@
 package com.xkcoding.ghostclip.ui
 
 import android.content.BroadcastReceiver
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -14,17 +16,21 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.xkcoding.ghostclip.R
 import com.xkcoding.ghostclip.clip.ClipboardHelper
 import com.xkcoding.ghostclip.clip.SyncBridge
 import com.xkcoding.ghostclip.net.NetworkCoordinator
+import com.xkcoding.ghostclip.net.PairingInfo
+import com.xkcoding.ghostclip.net.PairingManager
 import com.xkcoding.ghostclip.service.GhostClipService
 import com.xkcoding.ghostclip.util.DebugLog
 
 /**
- * 主界面 -- 连接状态、最近同步记录、调试日志
+ * 主界面 -- 连接状态、配对操作、最近同步记录、调试日志
  *
  * Intent auto_sync=true 时转发到 QuickSyncActivity
  */
@@ -36,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var deviceInfo: LinearLayout
     private lateinit var deviceName: TextView
     private lateinit var connType: TextView
+    private lateinit var btnPairAction: TextView
     private lateinit var syncList: LinearLayout
     private lateinit var emptyState: LinearLayout
     private lateinit var syncCount: TextView
@@ -45,6 +52,24 @@ class MainActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val syncRecords = mutableListOf<SyncRecord>()
     private var batteryGuideShown = false
+
+    // 扫码结果回调
+    private val scanLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data ?: return@registerForActivityResult
+            val macHash = data.getStringExtra(ScanActivity.EXTRA_MAC_HASH) ?: return@registerForActivityResult
+            val token = data.getStringExtra(ScanActivity.EXTRA_TOKEN) ?: return@registerForActivityResult
+            val device = data.getStringExtra(ScanActivity.EXTRA_DEVICE_NAME) ?: ""
+
+            DebugLog.d(TAG, "扫码结果: mac_hash=$macHash, device=$device")
+            val info = PairingInfo(macHash, token, device)
+
+            // 通知 NetworkCoordinator 启动配对连接
+            GhostClipService.onScanResult(info)
+        }
+    }
 
     // 监听来自 Service 的状态更新
     private val stateReceiver = object : BroadcastReceiver() {
@@ -63,6 +88,14 @@ class MainActivity : AppCompatActivity() {
                     val source = intent.getStringExtra("source") ?: "Android"
                     DebugLog.d(TAG, "收到同步广播: dir=$direction, source=$source, len=${text.length}")
                     addSyncRecord(text, direction, source)
+                }
+                NetworkCoordinator.ACTION_KICKED -> {
+                    Toast.makeText(this@MainActivity, R.string.kicked_toast, Toast.LENGTH_LONG).show()
+                    updatePairingUI()
+                }
+                NetworkCoordinator.ACTION_DISCOVERY_TIMEOUT -> {
+                    Toast.makeText(this@MainActivity, R.string.discovery_timeout_toast, Toast.LENGTH_LONG).show()
+                    updatePairingUI()
                 }
             }
         }
@@ -87,14 +120,14 @@ class MainActivity : AppCompatActivity() {
         setupDebugLog()
 
         // 初始状态
-        updateConnectionUI("DISCONNECTED", "", "")
+        updatePairingUI()
     }
 
     override fun onResume() {
         super.onResume()
         DebugLog.d(TAG, "onResume")
 
-        // 首次启动检测电池优化引导 (每次 Activity 生命周期只弹一次)
+        // 首次启动检测电池优化引导
         if (!batteryGuideShown && BatteryGuideActivity.shouldShow(this)) {
             batteryGuideShown = true
             startActivity(Intent(this, BatteryGuideActivity::class.java))
@@ -104,17 +137,20 @@ class MainActivity : AppCompatActivity() {
         val filter = IntentFilter().apply {
             addAction(ACTION_CONNECTION_CHANGED)
             addAction(ACTION_CLIP_SYNCED)
+            addAction(NetworkCoordinator.ACTION_KICKED)
+            addAction(NetworkCoordinator.ACTION_DISCOVERY_TIMEOUT)
         }
         ContextCompat.registerReceiver(
             this, stateReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED
         )
 
-        // 主动查询当前连接状态（补偿注册前可能错过的广播）
+        // 主动查询当前连接状态
         val state = NetworkCoordinator.lastState
         DebugLog.d(TAG, "查询连接状态: ${state.name}, device=${NetworkCoordinator.lastDeviceName}")
         updateConnectionUI(state.name, NetworkCoordinator.lastDeviceName, NetworkCoordinator.lastConnLabel)
+        updatePairingUI()
 
-        // 从同步历史恢复列表（持久缓存，不清空，覆盖 UI 列表）
+        // 从同步历史恢复列表
         val history = NetworkCoordinator.getSyncHistory()
         if (history.isNotEmpty()) {
             DebugLog.d(TAG, "恢复 ${history.size} 条同步记录")
@@ -125,22 +161,19 @@ class MainActivity : AppCompatActivity() {
             refreshSyncList()
         }
 
-        // 检查后台收到的远端剪贴板（Android 10+ 后台无法写入剪贴板，在前台补写）
+        // 检查后台收到的远端剪贴板
         NetworkCoordinator.consumePendingClip()?.let { pendingText ->
             val currentClip = ClipboardHelper.read(this)
             if (currentClip == null || currentClip.isBlank() || currentClip == pendingText) {
-                // 剪贴板为空或已是该内容 → 写入
                 DebugLog.d(TAG, "前台写入 pending 远端剪贴板: ${pendingText.take(80)}")
                 ClipboardHelper.write(this, pendingText)
             } else {
-                // 用户已复制新内容 → 不覆盖
                 DebugLog.d(TAG, "跳过 pendingClip(用户已有新剪贴板内容: ${currentClip.take(40)})")
             }
-            // 无论是否写入，都刷新 hash TTL 防止 echo
             GhostClipService.hashPool.checkAndRecord(pendingText)
         }
 
-        // 延迟读取剪贴板（等待 window focus）
+        // 延迟读取剪贴板
         handler.postDelayed({ readClipboard("onResume") }, 300)
     }
 
@@ -154,7 +187,6 @@ class MainActivity : AppCompatActivity() {
         if (hasFocus) {
             DebugLog.d(TAG, "onWindowFocusChanged: hasFocus=true")
 
-            // 再次检查 pending clip（window focus 后写剪贴板更可靠）
             NetworkCoordinator.consumePendingClip()?.let { pendingText ->
                 val currentClip = ClipboardHelper.read(this)
                 if (currentClip == null || currentClip.isBlank() || currentClip == pendingText) {
@@ -183,6 +215,7 @@ class MainActivity : AppCompatActivity() {
         deviceInfo = findViewById(R.id.device_info)
         deviceName = findViewById(R.id.device_name)
         connType = findViewById(R.id.conn_type)
+        btnPairAction = findViewById(R.id.btn_pair_action)
         syncList = findViewById(R.id.sync_list)
         emptyState = findViewById(R.id.empty_state)
         syncCount = findViewById(R.id.sync_count)
@@ -199,19 +232,59 @@ class MainActivity : AppCompatActivity() {
             DebugLog.clear()
             logText.text = ""
         }
+
+        btnPairAction.setOnClickListener {
+            when (PairingManager.state) {
+                PairingManager.State.UNPAIRED -> {
+                    // 打开扫码页
+                    scanLauncher.launch(Intent(this, ScanActivity::class.java))
+                }
+                PairingManager.State.CONNECTED, PairingManager.State.RECONNECTING -> {
+                    // 解除配对
+                    GhostClipService.unpair()
+                    Toast.makeText(this, R.string.unpaired_toast, Toast.LENGTH_SHORT).show()
+                    updatePairingUI()
+                }
+                else -> {} // CONNECTING 时不操作
+            }
+        }
+    }
+
+    /**
+     * 更新配对按钮 UI
+     */
+    private fun updatePairingUI() {
+        when (PairingManager.state) {
+            PairingManager.State.UNPAIRED -> {
+                btnPairAction.text = getString(R.string.btn_scan_pair)
+                btnPairAction.setBackgroundResource(R.drawable.bg_btn_accent)
+                btnPairAction.visibility = View.VISIBLE
+                updateConnectionUI("DISCONNECTED", "", "")
+            }
+            PairingManager.State.CONNECTING -> {
+                btnPairAction.visibility = View.GONE
+                updateConnectionUI("CONNECTING", "", "")
+            }
+            PairingManager.State.CONNECTED -> {
+                btnPairAction.text = getString(R.string.btn_unpair)
+                btnPairAction.setBackgroundResource(R.drawable.bg_btn_error)
+                btnPairAction.visibility = View.VISIBLE
+            }
+            PairingManager.State.RECONNECTING -> {
+                btnPairAction.text = getString(R.string.btn_unpair)
+                btnPairAction.setBackgroundResource(R.drawable.bg_btn_error)
+                btnPairAction.visibility = View.VISIBLE
+                updateConnectionUI("RECONNECTING", PairingManager.macDeviceName, "")
+            }
+        }
     }
 
     private fun setupDebugLog() {
-        // 显示已有日志
         logText.text = DebugLog.getAll()
-
-        // 监听新日志
         DebugLog.onNewLog = { line ->
             logText.append(line + "\n")
             logScroll.post { logScroll.fullScroll(View.FOCUS_DOWN) }
         }
-
-        // 初始滚动到底部
         logScroll.post { logScroll.fullScroll(View.FOCUS_DOWN) }
     }
 
@@ -223,20 +296,17 @@ class MainActivity : AppCompatActivity() {
         }
         DebugLog.d(TAG, "[$source] 读取剪贴板: ${text.take(80)}")
 
-        // 防止 echo: 如果内容与最近从远端收到的一致，不回传
         val lastReceived = NetworkCoordinator.lastReceivedClip
         if (lastReceived != null && text == lastReceived) {
             DebugLog.d(TAG, "[$source] 跳过回传(内容来自远端)")
             return
         }
 
-        // 防止重复上报: 内容未变不再发送
         if (text == NetworkCoordinator.lastSentClip) {
             DebugLog.d(TAG, "[$source] 跳过(内容与上次上报相同)")
             return
         }
 
-        // 前台自动发送
         val sent = SyncBridge.sendClip(text, GhostClipService.hashPool, this)
         if (sent) {
             NetworkCoordinator.lastSentClip = text
@@ -258,7 +328,7 @@ class MainActivity : AppCompatActivity() {
                 statusText.text = getString(R.string.status_connected)
                 statusText.setTextColor(ContextCompat.getColor(this, R.color.accent_dark))
                 deviceInfo.visibility = View.VISIBLE
-                deviceName.text = device.ifEmpty { "MacBook Pro" }
+                deviceName.text = device.ifEmpty { PairingManager.macDeviceName.ifEmpty { "Mac" } }
                 connType.text = connLabel.ifEmpty { "局域网直连" }
             }
             "CLOUD" -> {
@@ -267,8 +337,24 @@ class MainActivity : AppCompatActivity() {
                 statusText.text = getString(R.string.status_cloud)
                 statusText.setTextColor(ContextCompat.getColor(this, R.color.warning_dark))
                 deviceInfo.visibility = View.VISIBLE
-                deviceName.text = device.ifEmpty { "MacBook Pro" }
+                deviceName.text = device.ifEmpty { "Mac" }
                 connType.text = connLabel.ifEmpty { "云端同步" }
+            }
+            "CONNECTING" -> {
+                statusCard.setBackgroundResource(R.drawable.bg_status_card_disconnected)
+                statusDot.setBackgroundResource(R.drawable.circle_warning)
+                statusText.text = getString(R.string.status_connecting)
+                statusText.setTextColor(ContextCompat.getColor(this, R.color.warning_dark))
+                deviceInfo.visibility = View.GONE
+            }
+            "RECONNECTING" -> {
+                statusCard.setBackgroundResource(R.drawable.bg_status_card_disconnected)
+                statusDot.setBackgroundResource(R.drawable.circle_warning)
+                statusText.text = getString(R.string.status_reconnecting)
+                statusText.setTextColor(ContextCompat.getColor(this, R.color.warning_dark))
+                deviceInfo.visibility = View.VISIBLE
+                deviceName.text = device.ifEmpty { PairingManager.macDeviceName.ifEmpty { "Mac" } }
+                connType.text = "重连中…"
             }
             else -> {
                 statusCard.setBackgroundResource(R.drawable.bg_status_card_disconnected)
@@ -304,7 +390,6 @@ class MainActivity : AppCompatActivity() {
         syncList.removeAllViews()
         for ((index, record) in syncRecords.withIndex()) {
             if (index > 0) {
-                // 分割线
                 val divider = View(this).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, 1
@@ -343,6 +428,13 @@ class MainActivity : AppCompatActivity() {
                 getString(R.string.send_to_device, record.source)
             }
             textTime.text = "$timeAgo \u00b7 $sourceLabel"
+
+            // 7.6: 点击复制到剪贴板
+            itemView.setOnClickListener {
+                val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                cm.setPrimaryClip(ClipData.newPlainText("GhostClip", record.text))
+                Toast.makeText(this, R.string.copied_toast, Toast.LENGTH_SHORT).show()
+            }
 
             syncList.addView(itemView)
         }

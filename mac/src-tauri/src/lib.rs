@@ -2,7 +2,9 @@ mod clipboard;
 mod cloud_client;
 mod hash_pool;
 mod mdns;
+mod net_monitor;
 mod network;
+mod pairing;
 mod presence;
 mod settings;
 mod ws_server;
@@ -11,6 +13,7 @@ use clipboard::{get_change_count, read_clipboard, write_clipboard};
 use cloud_client::CloudError;
 use hash_pool::{md5_hash, HashPool};
 use network::{ConnectionState, NetworkConfig, NetworkManager};
+use pairing::PairingManager;
 use settings::Settings;
 use std::sync::{
     atomic::{AtomicIsize, AtomicU8, AtomicU64, Ordering},
@@ -53,6 +56,8 @@ pub struct AppState {
     pub settings: StdMutex<Settings>,
     /// 缓存的连接状态 (0=Disconnected, 1=Lan, 2=Cloud)
     pub current_conn_state: AtomicU8,
+    /// 配对管理器
+    pub pairing: Arc<PairingManager>,
 }
 
 /// 安全截取 UTF-8 字符串（按字符数，不按字节）
@@ -124,6 +129,71 @@ fn cmd_get_connection_state(app: tauri::AppHandle) -> String {
         "deviceName": "Android",
         "connectionLabel": label,
     }).to_string()
+}
+
+/// 生成 QR 码 SVG 数据
+#[tauri::command]
+fn cmd_generate_qr_code(app: tauri::AppHandle) -> Result<String, String> {
+    let state = app.state::<AppState>();
+    let uri = state.pairing.qr_uri();
+
+    use qrcode::QrCode;
+    let code = QrCode::new(uri.as_bytes())
+        .map_err(|e| format!("生成 QR 码失败: {}", e))?;
+
+    let svg = code
+        .render::<qrcode::render::svg::Color>()
+        .min_dimensions(256, 256)
+        .max_dimensions(512, 512)
+        .quiet_zone(true)
+        .build();
+
+    Ok(svg)
+}
+
+/// 获取当前配对状态
+#[tauri::command]
+fn cmd_get_pairing_state(app: tauri::AppHandle) -> String {
+    let state = app.state::<AppState>();
+    let pairing = &state.pairing;
+
+    let (status, device_name) = match pairing.status() {
+        pairing::PairingStatus::WaitingPair => ("waiting_pair", None),
+        pairing::PairingStatus::Paired { device_id } => ("paired", Some(device_id)),
+    };
+
+    serde_json::json!({
+        "status": status,
+        "deviceName": device_name,
+        "macHash": pairing.mac_hash(),
+    }).to_string()
+}
+
+/// 解除配对
+#[tauri::command]
+async fn cmd_unpair(app: tauri::AppHandle) -> Result<(), String> {
+    let state = app.state::<AppState>();
+
+    // 向已配对设备发送 unpair 消息并断开
+    {
+        let net_guard = state.network.lock().await;
+        if let Some(ref net) = *net_guard {
+            net.send_unpair_and_disconnect().await;
+        }
+    }
+
+    // 重新生成 token
+    state.pairing.regenerate_token();
+    state.pairing.set_waiting_pair();
+
+    // 发射配对状态变更事件到前端
+    let _ = app.emit("pairing-state-changed", serde_json::json!({
+        "status": "waiting_pair",
+        "deviceName": serde_json::Value::Null,
+    }));
+
+    log::info!("用户已解除配对");
+    Ok(())
 }
 
 #[tauri::command]
@@ -400,6 +470,7 @@ fn start_network(app_handle: tauri::AppHandle) {
     let network_state = state.network.clone();
 
     // 从设置中读取云端配置
+    let pairing = state.pairing.clone();
     let (cloud_url, cloud_token, cloud_enabled) = {
         let settings = state.settings.lock().unwrap();
         (
@@ -426,6 +497,7 @@ fn start_network(app_handle: tauri::AppHandle) {
                 None
             },
             device_id,
+            pairing,
         };
 
         match NetworkManager::start(config, hash_pool, receive_tx, error_tx).await {
@@ -460,13 +532,26 @@ fn start_network(app_handle: tauri::AppHandle) {
                     }
                 });
 
-                // 监听连接状态变更，自动通知前端
+                // 监听连接状态变更，自动通知前端（含配对状态）
                 let app_for_state = app_handle.clone();
+                let net_for_state = net.clone();
                 tokio::spawn(async move {
                     while state_rx.changed().await.is_ok() {
                         let new_state = *state_rx.borrow();
                         debug_log(&format!("连接状态变更: {}", new_state));
                         emit_connection_state(&app_for_state, new_state);
+
+                        // 同步发射配对状态变更事件
+                        let pairing = net_for_state.pairing();
+                        let (status, device_name) = if pairing.is_paired() {
+                            ("paired", pairing.paired_device_id())
+                        } else {
+                            ("waiting_pair", None)
+                        };
+                        let _ = app_for_state.emit("pairing-state-changed", serde_json::json!({
+                            "status": status,
+                            "deviceName": device_name,
+                        }));
                     }
                 });
             }
@@ -626,6 +711,66 @@ fn timestamp_now() -> u64 {
         .as_millis() as u64
 }
 
+/// 启动 WiFi 网络变更监控
+///
+/// WiFi 变更时：踢掉已配对设备 → 重新生成 token → 状态回到 WAITING_PAIR → 重建网络
+fn start_net_monitor(app_handle: tauri::AppHandle) {
+    let (_monitor, mut rx) = net_monitor::NetMonitor::start();
+    // 保持 monitor 的所有权（不被 drop），通过 leak 延长生命周期
+    // NetMonitor 会在 App 退出时自然销毁
+    std::mem::forget(_monitor);
+
+    tauri::async_runtime::spawn(async move {
+        while let Some(event) = rx.recv().await {
+            debug_log(&format!("WiFi 网络变更检测: SSID={:?}", event.ssid));
+
+            let state = app_handle.state::<AppState>();
+
+            // 踢掉已配对设备
+            {
+                let net_guard = state.network.lock().await;
+                if let Some(ref net) = *net_guard {
+                    if net.pairing().is_paired() {
+                        net.send_unpair_and_disconnect().await;
+                        debug_log("WiFi 变更：已踢掉配对设备");
+                    }
+                }
+            }
+
+            // 重新生成 token
+            state.pairing.regenerate_token();
+            state.pairing.set_waiting_pair();
+
+            // 通知前端配对状态变更
+            let _ = app_handle.emit("pairing-state-changed", serde_json::json!({
+                "status": "waiting_pair",
+                "deviceName": serde_json::Value::Null,
+            }));
+
+            // 重建网络（500ms 防抖）
+            let gen = NETWORK_RESTART_GEN.fetch_add(1, Ordering::SeqCst) + 1;
+            debug_log(&format!("WiFi 变更触发网络重建 (gen={})", gen));
+            let network = state.network.clone();
+            let app_clone = app_handle.clone();
+            tokio::spawn(async move {
+                tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+                if NETWORK_RESTART_GEN.load(Ordering::SeqCst) != gen {
+                    return;
+                }
+                {
+                    let mut net_guard = network.lock().await;
+                    if let Some(ref net) = *net_guard {
+                        net.shutdown();
+                    }
+                    *net_guard = None;
+                }
+                tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+                start_network(app_clone);
+            });
+        }
+    });
+}
+
 // ============================================
 // App Entry
 // ============================================
@@ -640,6 +785,9 @@ pub fn run() {
     let initial_hotkey = loaded_settings.hotkey_raw.clone();
     log::info!("已加载设置，快捷键: {}", initial_hotkey);
 
+    // 初始化配对管理器
+    let pairing = PairingManager::new().expect("初始化配对管理器失败");
+
     let state = AppState {
         hash_pool: Arc::new(HashPool::new()),
         last_change_count: AtomicIsize::new(0),
@@ -647,6 +795,7 @@ pub fn run() {
         device_id,
         settings: StdMutex::new(loaded_settings),
         current_conn_state: AtomicU8::new(0), // Disconnected
+        pairing,
     };
 
     tauri::Builder::default()
@@ -703,6 +852,9 @@ pub fn run() {
             // 启动网络服务
             start_network(app.handle().clone());
 
+            // 启动 WiFi 网络变更监控
+            start_net_monitor(app.handle().clone());
+
             log::info!("GhostClip 已启动 - Menu Bar 模式");
             Ok(())
         })
@@ -713,6 +865,9 @@ pub fn run() {
             cmd_md5_hash,
             cmd_trigger_send,
             cmd_get_connection_state,
+            cmd_generate_qr_code,
+            cmd_get_pairing_state,
+            cmd_unpair,
             cmd_quit,
             cmd_update_hotkey,
             cmd_get_settings,

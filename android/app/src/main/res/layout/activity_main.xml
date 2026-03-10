@@ -117,6 +117,20 @@
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                 </LinearLayout>
+
+                <!-- 配对操作按钮 -->
+                <TextView
+                    android:id="@+id/btn_pair_action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_btn_accent"
+                    android:gravity="center"
+                    android:paddingHorizontal="24dp"
+                    android:text="@string/btn_scan_pair"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium" />
             </LinearLayout>
 
             <!-- Recent Syncs Section -->

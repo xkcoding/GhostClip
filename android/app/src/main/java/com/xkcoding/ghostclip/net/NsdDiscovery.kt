@@ -22,6 +22,10 @@ class NsdDiscovery(context: Context) {
 
     var listener: Listener? = null
 
+    /** 配对 mac_hash -- 设置后仅回调匹配该值的服务，null 时回调所有服务 */
+    @Volatile
+    var filterMacHash: String? = null
+
     private val nsdManager = context.getSystemService(Context.NSD_SERVICE) as NsdManager
     // 使用锁保护状态标志，NSD 回调在独立线程中触发，需要线程安全
     private val stateLock = Any()
@@ -99,6 +103,24 @@ class NsdDiscovery(context: Context) {
             val host = serviceInfo.host?.hostAddress ?: return
             val port = serviceInfo.port
             DebugLog.d(TAG, "解析成功: ${serviceInfo.serviceName} -> $host:$port")
+
+            // mac_hash 过滤：优先从 TXT 记录读取，回退到服务名 gc-{mac_hash}
+            val filter = filterMacHash
+            if (filter != null) {
+                val txtHash = serviceInfo.attributes?.get("mac_hash")
+                    ?.let { String(it, Charsets.UTF_8) }
+                val nameHash = serviceInfo.serviceName
+                    .takeIf { it.startsWith("gc-") }
+                    ?.removePrefix("gc-")
+                val matched = filter.equals(txtHash, ignoreCase = true)
+                    || filter.equals(nameHash, ignoreCase = true)
+                if (!matched) {
+                    DebugLog.d(TAG, "mac_hash 不匹配, 跳过: filter=$filter, txt=$txtHash, name=${serviceInfo.serviceName}")
+                    return
+                }
+                DebugLog.d(TAG, "mac_hash 匹配成功: $filter")
+            }
+
             listener?.onServiceFound(host, port, serviceInfo.serviceName)
         }
     }

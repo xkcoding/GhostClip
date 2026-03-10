@@ -33,8 +33,16 @@ class LanClient(
         fun onConnected()
         fun onDisconnected()
         fun onClipReceived(content: String, hash: String, deviceId: String)
+        /** 收到 pair_ok 消息 */
+        fun onPairOk(deviceName: String) {}
+        /** 收到 kicked 消息（被新设备替代） */
+        fun onKicked(reason: String) {}
+        /** 收到 unpair 消息（对方解除配对） */
+        fun onUnpaired() {}
         /** 连续多次重连失败，建议重新进行 NSD 发现 */
         fun onReconnectExhausted() {}
+        /** Token 鉴权被拒（HTTP 401），不应重连 */
+        fun onAuthRejected() {}
     }
 
     var listener: Listener? = null
@@ -56,6 +64,10 @@ class LanClient(
     var isConnected = false
         private set
 
+    /** 配对 token -- 连接时附加到 URL query */
+    @Volatile
+    var pairingToken: String? = null
+
     /**
      * 建立 WebSocket 连接到 Mac
      */
@@ -64,7 +76,8 @@ class LanClient(
         currentHost = host
         currentPort = port
 
-        val url = "ws://$host:$port"
+        val token = pairingToken
+        val url = if (token != null) "ws://$host:$port?token=$token" else "ws://$host:$port"
         DebugLog.d(TAG, "连接 WebSocket: $url")
 
         val request = Request.Builder().url(url).build()
@@ -79,20 +92,45 @@ class LanClient(
             override fun onMessage(webSocket: WebSocket, text: String) {
                 try {
                     val json = JSONObject(text)
-                    // Mac 端 ClipMessage: { device_id, text, hash, timestamp }
-                    val clipText = json.getString("text")
-                    val hash = json.getString("hash")
-                    val senderDeviceId = json.getString("device_id")
-                    DebugLog.d(TAG, "收到消息: hash=$hash, from=$senderDeviceId, len=${clipText.length}")
-                    listener?.onClipReceived(clipText, hash, senderDeviceId)
+                    // 消息类型分发：pair_ok / kicked / unpair / clip（无 type 兼容为 clip）
+                    when (json.optString("type", "clip")) {
+                        "pair_ok" -> {
+                            val device = json.optString("device", "")
+                            DebugLog.d(TAG, "收到 pair_ok: device=$device")
+                            listener?.onPairOk(device)
+                        }
+                        "kicked" -> {
+                            val reason = json.optString("reason", "")
+                            DebugLog.d(TAG, "收到 kicked: reason=$reason")
+                            listener?.onKicked(reason)
+                        }
+                        "unpair" -> {
+                            DebugLog.d(TAG, "收到 unpair")
+                            listener?.onUnpaired()
+                        }
+                        else -> {
+                            // clip 消息
+                            val clipText = json.getString("text")
+                            val hash = json.getString("hash")
+                            val senderDeviceId = json.getString("device_id")
+                            DebugLog.d(TAG, "收到 clip: hash=$hash, from=$senderDeviceId, len=${clipText.length}")
+                            listener?.onClipReceived(clipText, hash, senderDeviceId)
+                        }
+                    }
                 } catch (e: Exception) {
                     DebugLog.e(TAG, "解析 WebSocket 消息失败: ${e.message}")
                 }
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                DebugLog.w(TAG, "WebSocket 失败: ${t.message}")
+                val code = response?.code
+                DebugLog.w(TAG, "WebSocket 失败: ${t.message}, httpCode=$code")
                 isConnected = false
+                if (code == 401) {
+                    // Token 鉴权被拒，不重连
+                    listener?.onAuthRejected()
+                    return
+                }
                 listener?.onDisconnected()
                 scheduleReconnect()
             }

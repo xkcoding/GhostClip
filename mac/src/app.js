@@ -45,8 +45,21 @@ const state = {
   deviceName: '',
   // Connection type label
   connectionLabel: '',
+  // Pairing state: 'waiting_pair' | 'paired'
+  pairingState: 'waiting_pair',
+  // Paired device name (from Android)
+  pairedDeviceName: '',
+  // MAC hash identifier (e.g. gc-a3f8e2c71b04)
+  macHash: '',
+  // QR code SVG data
+  qrSvg: '',
+  // Whether QR popup is shown
+  qrPopupVisible: false,
   // Recent sync records
   recentSyncs: [],
+  // Copy feedback: index of recently copied item
+  copiedIndex: -1,
+  copiedTimer: null,
   // Settings
   settings: {
     hotkey: '\u2318 \u21E7 C',
@@ -143,7 +156,7 @@ function renderDropdown() {
     <div class="conn-error">${escapeHtml(state.connectionError)}</div>
   ` : '';
 
-  // Recent sync records
+  // Recent sync records (3.7: click to copy + hover)
   let recentHtml = '';
   if (state.recentSyncs.length === 0) {
     recentHtml = `
@@ -153,14 +166,15 @@ function renderDropdown() {
       </div>
     `;
   } else {
-    recentHtml = state.recentSyncs.map(sync => {
+    recentHtml = state.recentSyncs.map((sync, index) => {
       const isIncoming = sync.direction === 'incoming';
       const icon = isIncoming ? icons.arrowDownLeft : icons.arrowUpRight;
       const iconClass = isIncoming ? 'incoming' : 'outgoing';
+      const isCopied = state.copiedIndex === index;
       return `
-        <div class="recent-row" title="${escapeHtml(sync.text)}">
+        <div class="recent-row copyable${isCopied ? ' copied' : ''}" title="${escapeHtml(sync.text)}" data-action="copy-recent" data-index="${index}">
           <span class="icon ${iconClass}">${icon}</span>
-          <span class="recent-text">${escapeHtml(truncate(sync.text, 40))}</span>
+          <span class="recent-text">${isCopied ? '\u2705 \u5DF2\u590D\u5236' : escapeHtml(truncate(sync.text, 40))}</span>
           <span class="recent-time">${escapeHtml(formatTimeAgo(sync.timestamp))}</span>
         </div>
       `;
@@ -196,6 +210,17 @@ function renderDropdown() {
             <span class="icon">${icons.settings}</span>
             <span class="text">\u8BBE\u7F6E\u2026</span>
           </div>
+          ${state.pairingState === 'paired' ? `
+          <div class="action-row" data-action="unpair">
+            <span class="icon">${icons.unlink}</span>
+            <span class="text">\u89E3\u9664\u914D\u5BF9</span>
+          </div>
+          ` : `
+          <div class="action-row" data-action="pair">
+            <span class="icon">${icons.qrCode}</span>
+            <span class="text">\u914D\u5BF9\u2026</span>
+          </div>
+          `}
           <div class="divider" style="margin: 0 -8px; width: calc(100% + 16px);"></div>
           <div class="action-row quit" data-action="quit">
             <span class="icon">${icons.power}</span>
@@ -225,12 +250,15 @@ function renderDropdown() {
 function renderSettings() {
   const hotkeyText = state.isRecordingHotkey ? '\u6309\u4E0B\u65B0\u5FEB\u6377\u952E...' : state.settings.hotkey;
   const badgeClass = state.isRecordingHotkey ? 'recording' : '';
-  const cloudToggleClass = state.settings.cloudEnabled ? 'active' : '';
   const notifToggleClass = state.settings.notificationsEnabled ? 'active' : '';
 
-  const settingsErrorHtml = state.settingsError ? `
-    <div class="settings-error">${escapeHtml(state.settingsError)}</div>
-  ` : '';
+  const pairStatusText = state.pairingState === 'paired'
+    ? `\u5DF2\u914D\u5BF9 \u00B7 ${escapeHtml(state.pairedDeviceName || 'Android')}`
+    : '\u672A\u914D\u5BF9';
+  const macHashText = state.macHash ? `gc-${escapeHtml(state.macHash)}` : '\u52A0\u8F7D\u4E2D...';
+  const pairBtnText = state.pairingState === 'paired' ? '\u89E3\u9664\u914D\u5BF9' : '\u914D\u5BF9';
+  const pairBtnAction = state.pairingState === 'paired' ? 'unpair' : 'pair';
+  const pairBtnClass = state.pairingState === 'paired' ? 'unpair-btn' : 'pair-btn';
 
   return `
     <div id="settings-view" class="active">
@@ -248,7 +276,25 @@ function renderSettings() {
         </div>
         <div class="settings-divider"></div>
 
-        <!-- Cloud Sync Section (暂时隐藏，后续启用 Durable Objects 时恢复) -->
+        <!-- Device Pairing Section (8.1: replaces Cloud config) -->
+        <div class="settings-section">
+          <span class="settings-section-label">\u8BBE\u5907\u914D\u5BF9</span>
+          <div class="field-group">
+            <span class="field-label">\u914D\u5BF9\u72B6\u6001</span>
+            <div class="field-display">${pairStatusText}</div>
+          </div>
+          <div class="field-group">
+            <span class="field-label">MAC \u6807\u8BC6</span>
+            <div class="field-display">${macHashText}</div>
+          </div>
+          <div class="key-row">
+            <span class="key-label">\u663E\u793A\u914D\u5BF9\u4E8C\u7EF4\u7801</span>
+            <div class="${pairBtnClass}" data-action="${pairBtnAction}">
+              <span>${pairBtnText}</span>
+            </div>
+          </div>
+        </div>
+        <div class="settings-divider"></div>
 
         <!-- Notifications Section -->
         <div class="settings-section">
@@ -261,6 +307,44 @@ function renderSettings() {
           </div>
           <p class="toggle-desc">\u5F00\u542F\u540E\uFF0C\u5F53\u63A5\u6536\u5230\u6765\u81EA Android \u7684\u526A\u8D34\u677F\u6570\u636E\u65F6\u4F1A\u5F39\u51FA\u7CFB\u7EDF\u901A\u77E5\u3002</p>
         </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================
+// View: QR Code Popup
+// ============================================
+
+function renderQrPopup() {
+  const deviceLabel = state.macHash ? `${escapeHtml(state.deviceName || 'Mac')} \u00B7 gc-${escapeHtml(state.macHash)}` : '';
+
+  return `
+    <div id="qr-popup" class="active">
+      <div class="qr-title-bar">
+        <div class="traffic-lights">
+          <div class="traffic-light red" data-action="close-qr"></div>
+          <div class="traffic-light yellow"></div>
+          <div class="traffic-light green"></div>
+        </div>
+        <span class="win-title">\u626B\u7801\u914D\u5BF9</span>
+        <div class="win-spacer"></div>
+      </div>
+      <div class="qr-title-divider"></div>
+      <div class="qr-body">
+        <div class="qr-code-container">
+          ${state.qrSvg || '<div class="qr-placeholder">\u52A0\u8F7D\u4E2D...</div>'}
+        </div>
+        <div class="qr-info">
+          <span class="qr-info-title">\u4F7F\u7528 Android \u7AEF\u626B\u63CF\u6B64\u4E8C\u7EF4\u7801</span>
+          <span class="qr-info-subtitle">\u914D\u5BF9\u540E\u5373\u53EF\u540C\u6B65\u526A\u8D34\u677F</span>
+        </div>
+        ${deviceLabel ? `
+        <div class="qr-device-label">
+          <span class="icon">${icons.monitor}</span>
+          <span>${deviceLabel}</span>
+        </div>
+        ` : ''}
       </div>
     </div>
   `;
@@ -298,6 +382,18 @@ function attachEventListeners() {
         break;
       case 'toggle-notif':
         handleToggleNotification();
+        break;
+      case 'pair':
+        handlePair();
+        break;
+      case 'unpair':
+        handleUnpair();
+        break;
+      case 'close-qr':
+        handleCloseQr();
+        break;
+      case 'copy-recent':
+        handleCopyRecent(actionEl);
         break;
       case 'clear-logs':
         state.debugLogs = [];
@@ -405,6 +501,78 @@ function handleStartRecordHotkey() {
   document.addEventListener('keyup', onKeyUp, true);
 }
 
+async function handlePair() {
+  // Generate QR code SVG and show popup
+  try {
+    const svgResult = await invoke('cmd_generate_qr_code');
+    if (svgResult) {
+      state.qrSvg = typeof svgResult === 'string' ? svgResult : '';
+    }
+    // Refresh pairing state to get latest macHash
+    await refreshPairingState();
+  } catch (e) {
+    console.warn('[GhostClip] Failed to generate QR code:', e);
+  }
+  state.qrPopupVisible = true;
+  render();
+}
+
+async function handleUnpair() {
+  try {
+    await invoke('cmd_unpair');
+  } catch (e) {
+    console.warn('[GhostClip] Failed to unpair:', e);
+  }
+}
+
+function handleCloseQr() {
+  state.qrPopupVisible = false;
+  render();
+}
+
+async function handleCopyRecent(el) {
+  const index = parseInt(el.dataset.index, 10);
+  const sync = state.recentSyncs[index];
+  if (!sync) return;
+
+  // Copy text to clipboard via Tauri or fallback
+  try {
+    if (window.__TAURI__ && window.__TAURI__.clipboard) {
+      await window.__TAURI__.clipboard.writeText(sync.text);
+    } else {
+      await navigator.clipboard.writeText(sync.text);
+    }
+  } catch (e) {
+    console.warn('[GhostClip] Failed to copy:', e);
+    return;
+  }
+
+  // Show copied feedback
+  if (state.copiedTimer) clearTimeout(state.copiedTimer);
+  state.copiedIndex = index;
+  render();
+  state.copiedTimer = setTimeout(() => {
+    state.copiedIndex = -1;
+    state.copiedTimer = null;
+    render();
+  }, 1500);
+}
+
+/**
+ * Refresh pairing state from backend (cmd_get_pairing_state)
+ */
+async function refreshPairingState() {
+  try {
+    const result = await invoke('cmd_get_pairing_state');
+    if (result) {
+      const data = typeof result === 'string' ? JSON.parse(result) : result;
+      state.pairingState = data.status || state.pairingState;
+      state.pairedDeviceName = data.deviceName || state.pairedDeviceName;
+      state.macHash = data.macHash || state.macHash;
+    }
+  } catch (_) { /* ignore */ }
+}
+
 function handleToggleCloud() {
   state.settings.cloudEnabled = !state.settings.cloudEnabled;
   saveSettings();
@@ -480,9 +648,9 @@ async function setupBackendListeners() {
     render();
   });
 
-  // Listen for new sync records
+  // Listen for new sync records (3.8: show notification on incoming)
   await listen('clip-synced', (event) => {
-    const { text, direction, timestamp } = event.payload;
+    const { text, direction, timestamp, deviceName } = event.payload;
     state.recentSyncs.unshift({
       text,
       direction, // 'incoming' or 'outgoing'
@@ -491,6 +659,25 @@ async function setupBackendListeners() {
     // Keep max 20 records
     if (state.recentSyncs.length > 20) {
       state.recentSyncs = state.recentSyncs.slice(0, 20);
+    }
+    // 3.8: Show macOS system notification for incoming clipboard
+    if (direction === 'incoming' && state.settings.notificationsEnabled) {
+      sendNotification(
+        `\u6765\u81EA ${deviceName || state.pairedDeviceName || 'Android'}`,
+        truncate(text, 100)
+      );
+    }
+    render();
+  });
+
+  // Listen for pairing state changes
+  await listen('pairing-state-changed', (event) => {
+    const { status, deviceName } = event.payload;
+    state.pairingState = status || state.pairingState;
+    if (deviceName !== undefined) state.pairedDeviceName = deviceName || '';
+    // 3.6: Auto-close QR popup on pairing success
+    if (status === 'paired' && state.qrPopupVisible) {
+      state.qrPopupVisible = false;
     }
     render();
   });
@@ -527,7 +714,8 @@ async function setupBackendListeners() {
   // Listen for view switch commands from tray menu
   await listen('show-dropdown', async () => {
     state.currentView = 'dropdown';
-    // 主动查询当前连接状态（补偿 popup 隐藏期间错过的事件）
+    state.qrPopupVisible = false;
+    // 主动查询当前连接状态和配对状态（补偿 popup 隐藏期间错过的事件）
     try {
       const result = await invoke('cmd_get_connection_state');
       if (result) {
@@ -537,6 +725,7 @@ async function setupBackendListeners() {
         state.connectionLabel = data.connectionLabel || state.connectionLabel;
       }
     } catch (_) { /* ignore */ }
+    await refreshPairingState();
     render();
   });
 
@@ -552,6 +741,7 @@ async function setupBackendListeners() {
       await currentWindow.onFocusChanged(({ payload: focused }) => {
         if (!focused) {
           state.currentView = 'dropdown'; // 重置视图状态
+          state.qrPopupVisible = false;
           invoke('cmd_popup_hide');
         }
       });
@@ -565,7 +755,9 @@ async function setupBackendListeners() {
 
 function render() {
   const app = document.getElementById('app');
-  if (state.currentView === 'settings') {
+  if (state.qrPopupVisible) {
+    app.innerHTML = renderQrPopup();
+  } else if (state.currentView === 'settings') {
     app.innerHTML = renderSettings();
   } else {
     app.innerHTML = renderDropdown();
@@ -586,6 +778,23 @@ function truncate(text, maxLen) {
   if (!text) return '';
   if (text.length <= maxLen) return text;
   return text.substring(0, maxLen - 1) + '\u2026';
+}
+
+/**
+ * Send macOS system notification via Tauri notification API (3.8)
+ */
+async function sendNotification(title, body) {
+  try {
+    if (window.__TAURI__ && window.__TAURI__.notification) {
+      const permission = await window.__TAURI__.notification.isPermissionGranted();
+      if (!permission) {
+        await window.__TAURI__.notification.requestPermission();
+      }
+      await window.__TAURI__.notification.sendNotification({ title, body });
+    }
+  } catch (e) {
+    console.warn('[GhostClip] Failed to send notification:', e);
+  }
 }
 
 function formatTimeAgo(timestamp) {
@@ -613,6 +822,9 @@ async function init() {
   if (window.location.hash === '#settings') {
     state.currentView = 'settings';
   }
+
+  // Query initial pairing state
+  await refreshPairingState();
 
   render();
   attachEventListeners();
