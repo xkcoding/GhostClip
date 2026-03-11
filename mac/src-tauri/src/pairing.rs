@@ -111,13 +111,18 @@ impl PairingManager {
     }
 
     /// 构建 QR 码 URI
-    pub fn qr_uri(&self) -> String {
+    ///
+    /// `host` 和 `port` 作为 mDNS 发现的 fallback：当企业网络禁止组播时，
+    /// Android 端可直接用 QR 中的 IP:Port 连接。
+    pub fn qr_uri(&self, host: &str, port: u16) -> String {
         let token = self.token.read().unwrap();
         format!(
-            "ghostclip://pair?mac_hash={}&token={}&device={}",
+            "ghostclip://pair?mac_hash={}&token={}&device={}&host={}&port={}",
             self.mac_hash,
             *token,
             urlencoded(&self.device_name),
+            urlencoded(host),
+            port,
         )
     }
 

@@ -49,6 +49,9 @@ class NetworkCoordinator(
     private var connectedHost: String = ""
     private var connectedPort: Int = 0
 
+    // 缓存扫码得到的配对信息（含 IP fallback）
+    private var currentPairingInfo: PairingInfo? = null
+
     private val prefs by lazy {
         context.getSharedPreferences("ghostclip_settings", Context.MODE_PRIVATE)
     }
@@ -140,6 +143,7 @@ class NetworkCoordinator(
      * 扫码成功后由外部调用 -- 触发 mDNS 发现
      */
     fun onScanResult(info: PairingInfo) {
+        currentPairingInfo = info
         snapshotWifi() // 记录扫码时的 WiFi 信息
         PairingManager.onScanned(info)
     }
@@ -210,6 +214,7 @@ class NetworkCoordinator(
         connectedMacName = ""
         connectedHost = ""
         connectedPort = 0
+        currentPairingInfo = null
     }
 
     private fun onPairingReconnecting() {
@@ -322,7 +327,17 @@ class NetworkCoordinator(
             if (PairingManager.state == PairingManager.State.CONNECTING
                 || PairingManager.state == PairingManager.State.RECONNECTING
             ) {
-                DebugLog.w(TAG, "mDNS 发现超时 (${DISCOVERY_TIMEOUT_MS}ms)")
+                // mDNS 超时 → 尝试 QR 码中的 IP:Port 直连
+                val info = currentPairingInfo
+                if (info != null && info.hasDirectConnect) {
+                    DebugLog.w(TAG, "mDNS 发现超时, 尝试 QR 直连 ${info.host}:${info.port}")
+                    connectedMacName = info.deviceName.ifEmpty { "Mac" }
+                    connectedHost = info.host!!
+                    connectedPort = info.port!!
+                    connectLan(info.host, info.port)
+                    return@launch
+                }
+                DebugLog.w(TAG, "mDNS 发现超时 (${DISCOVERY_TIMEOUT_MS}ms), 无 fallback")
                 // 广播超时提示
                 context.sendBroadcast(Intent(ACTION_DISCOVERY_TIMEOUT).apply {
                     setPackage(context.packageName)

@@ -58,6 +58,8 @@ pub struct AppState {
     pub current_conn_state: AtomicU8,
     /// 配对管理器
     pub pairing: Arc<PairingManager>,
+    /// WebSocket 服务端口（QR 码 fallback 用）
+    pub ws_port: u16,
 }
 
 /// 安全截取 UTF-8 字符串（按字符数，不按字节）
@@ -135,7 +137,8 @@ fn cmd_get_connection_state(app: tauri::AppHandle) -> String {
 #[tauri::command]
 fn cmd_generate_qr_code(app: tauri::AppHandle) -> Result<String, String> {
     let state = app.state::<AppState>();
-    let uri = state.pairing.qr_uri();
+    let local_ip = get_local_ip().unwrap_or_else(|| "0.0.0.0".to_string());
+    let uri = state.pairing.qr_uri(&local_ip, state.ws_port);
 
     use qrcode::QrCode;
     let code = QrCode::new(uri.as_bytes())
@@ -149,6 +152,16 @@ fn cmd_generate_qr_code(app: tauri::AppHandle) -> Result<String, String> {
         .build();
 
     Ok(svg)
+}
+
+/// 获取本机局域网 IP（优先非 loopback 的 IPv4）
+fn get_local_ip() -> Option<String> {
+    use std::net::UdpSocket;
+    // 通过 UDP connect 获取出口 IP（不实际发包）
+    let socket = UdpSocket::bind("0.0.0.0:0").ok()?;
+    socket.connect("8.8.8.8:80").ok()?;
+    let addr = socket.local_addr().ok()?;
+    Some(addr.ip().to_string())
 }
 
 /// 获取当前配对状态
@@ -796,6 +809,7 @@ pub fn run() {
         settings: StdMutex::new(loaded_settings),
         current_conn_state: AtomicU8::new(0), // Disconnected
         pairing,
+        ws_port: 9876,
     };
 
     tauri::Builder::default()

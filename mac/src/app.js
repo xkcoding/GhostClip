@@ -502,6 +502,15 @@ function handleStartRecordHotkey() {
 }
 
 async function handlePair() {
+  // 如果在 Settings 窗口中触发，关闭 Settings 窗口，让 main 窗口显示 QR
+  const currentWindow = window.__TAURI__?.window?.getCurrentWindow();
+  if (currentWindow && currentWindow.label === 'settings') {
+    // 通知 main 窗口显示 QR
+    await emit('show-qr-from-settings');
+    await currentWindow.close();
+    return;
+  }
+
   // Generate QR code SVG and show popup
   try {
     const svgResult = await invoke('cmd_generate_qr_code');
@@ -731,6 +740,28 @@ async function setupBackendListeners() {
 
   await listen('show-settings', () => {
     state.currentView = 'settings';
+    render();
+  });
+
+  // Settings 窗口发来的 QR 显示请求
+  await listen('show-qr-from-settings', async () => {
+    try {
+      const svgResult = await invoke('cmd_generate_qr_code');
+      if (svgResult) {
+        state.qrSvg = typeof svgResult === 'string' ? svgResult : '';
+      }
+      await refreshPairingState();
+    } catch (e) {
+      console.warn('[GhostClip] Failed to generate QR code:', e);
+    }
+    state.currentView = 'dropdown';
+    state.qrPopupVisible = true;
+    // 显示 main 窗口
+    const mainWin = window.__TAURI__?.window?.getCurrentWindow();
+    if (mainWin && mainWin.label === 'main') {
+      await mainWin.show();
+      await mainWin.setFocus();
+    }
     render();
   });
 

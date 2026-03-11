@@ -23,6 +23,14 @@
         android:theme="@style/Theme.GhostClip"
         tools:targetApi="35">
 
+        <!-- ICP 备案信息 -->
+        <meta-data
+            android:name="ICP_LICENSE"
+            android:value="浙ICP备15019787号-1" />
+        <meta-data
+            android:name="SECURITY_LICENSE"
+            android:value="浙公网安备33011002018177号" />
+
         <!-- 主界面 -->
         <activity
             android:name=".ui.MainActivity"
