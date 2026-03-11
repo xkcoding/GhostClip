@@ -205,19 +205,36 @@ async fn handle_new_connection(
     crate::debug_log(&format!("WebSocket 新连接请求: {}", addr));
 
     // 使用 accept_hdr_async 在 HTTP Upgrade 阶段验证 token
+    // 用于在闭包外保存从 URL 提取的设备名
+    let device_name_cell = Arc::new(std::sync::Mutex::new(String::new()));
+    let device_name_for_cb = device_name_cell.clone();
+
     let pairing_for_cb = pairing.clone();
     let ws_stream = match tokio_tungstenite::accept_hdr_async(stream, move |req: &http::Request<()>, resp: http::Response<()>| {
-        // 从 URI query 中提取 token
+        // 从 URI query 中提取 token 和 device
         let uri = req.uri();
         let query = uri.query().unwrap_or("");
-        let token = query
-            .split('&')
-            .find_map(|pair| {
-                let mut kv = pair.splitn(2, '=');
-                let key = kv.next()?;
-                let val = kv.next()?;
-                if key == "token" { Some(val.to_string()) } else { None }
-            });
+
+        let mut token = None;
+        let mut device = String::new();
+        for pair in query.split('&') {
+            let mut kv = pair.splitn(2, '=');
+            if let (Some(key), Some(val)) = (kv.next(), kv.next()) {
+                match key {
+                    "token" => token = Some(val.to_string()),
+                    "device" => {
+                        // URL 解码设备名
+                        device = percent_decode(val);
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        // 保存设备名到外部 cell
+        if !device.is_empty() {
+            *device_name_for_cb.lock().unwrap() = device;
+        }
 
         match token {
             Some(t) if pairing_for_cb.verify_token(&t) => {
@@ -246,6 +263,14 @@ async fn handle_new_connection(
             return;
         }
     };
+
+    // 从 URL 提取到的 Android 设备名
+    let android_device_name = {
+        let name = device_name_cell.lock().unwrap();
+        if name.is_empty() { format!("Android-{}", addr) } else { name.clone() }
+    };
+    pairing.set_paired_device_name(android_device_name.clone());
+    crate::debug_log(&format!("Android 设备: {}", android_device_name));
 
     // Token 验证通过，处理 1:1 踢人逻辑
     {
@@ -403,4 +428,29 @@ async fn handle_new_connection(
     }
 
     crate::debug_log(&format!("WebSocket 客户端已配对: {}", addr));
+}
+
+/// 简单 URL percent-decode
+fn percent_decode(input: &str) -> String {
+    let mut result = Vec::with_capacity(input.len());
+    let bytes = input.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'%' && i + 2 < bytes.len() {
+            if let Ok(byte) = u8::from_str_radix(
+                &input[i + 1..i + 3], 16
+            ) {
+                result.push(byte);
+                i += 3;
+                continue;
+            }
+        }
+        if bytes[i] == b'+' {
+            result.push(b' ');
+        } else {
+            result.push(bytes[i]);
+        }
+        i += 1;
+    }
+    String::from_utf8(result).unwrap_or_else(|_| input.to_string())
 }

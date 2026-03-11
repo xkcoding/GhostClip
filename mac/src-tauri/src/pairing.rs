@@ -25,8 +25,10 @@ pub struct PairingManager {
     token: RwLock<String>,
     /// 当前配对状态
     status: RwLock<PairingStatus>,
-    /// 设备名称（hostname）
+    /// 本机设备名称（hostname）
     device_name: String,
+    /// 已配对的远端设备名称（如 "Xiaomi 15 Pro"）
+    paired_device_name: RwLock<String>,
 }
 
 impl PairingManager {
@@ -48,6 +50,7 @@ impl PairingManager {
             token: RwLock::new(token),
             status: RwLock::new(PairingStatus::WaitingPair),
             device_name,
+            paired_device_name: RwLock::new(String::new()),
         }))
     }
 
@@ -84,10 +87,24 @@ impl PairingManager {
         log::info!("配对状态 → PAIRED (device: {})", device_id);
     }
 
+    /// 设置已配对的远端设备名称
+    pub fn set_paired_device_name(&self, name: String) {
+        let mut n = self.paired_device_name.write().unwrap();
+        *n = name;
+    }
+
+    /// 获取已配对的远端设备名称
+    pub fn paired_device_name(&self) -> String {
+        self.paired_device_name.read().unwrap().clone()
+    }
+
     /// 回到等待配对状态
     pub fn set_waiting_pair(&self) {
         let mut status = self.status.write().unwrap();
         *status = PairingStatus::WaitingPair;
+        // 清除已配对设备名
+        let mut name = self.paired_device_name.write().unwrap();
+        name.clear();
         log::info!("配对状态 → WAITING_PAIR");
     }
 

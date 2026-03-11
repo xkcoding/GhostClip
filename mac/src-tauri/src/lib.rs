@@ -126,9 +126,11 @@ fn cmd_get_connection_state(app: tauri::AppHandle) -> String {
         ConnectionState::Cloud => ("cloud", "云端同步"),
         ConnectionState::Disconnected => ("disconnected", "未连接"),
     };
+    let paired_name = state.pairing.paired_device_name();
+    let device_name = if paired_name.is_empty() { "Android".to_string() } else { paired_name };
     serde_json::json!({
         "state": state_str,
-        "deviceName": "Android",
+        "deviceName": device_name,
         "connectionLabel": label,
     }).to_string()
 }
@@ -439,9 +441,17 @@ fn emit_connection_state_with_error(
         ConnectionState::Disconnected => ("disconnected", "未连接"),
     };
 
+    // 使用真实的已配对设备名
+    let device_name = if let Some(app_state) = app.try_state::<AppState>() {
+        let name = app_state.pairing.paired_device_name();
+        if name.is_empty() { "Android".to_string() } else { name }
+    } else {
+        "Android".to_string()
+    };
+
     let mut payload = serde_json::json!({
         "state": state_str,
-        "deviceName": "Android",
+        "deviceName": device_name,
         "connectionLabel": label,
     });
 

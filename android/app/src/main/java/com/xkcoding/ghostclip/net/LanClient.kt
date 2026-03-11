@@ -77,7 +77,8 @@ class LanClient(
         currentPort = port
 
         val token = pairingToken
-        val url = if (token != null) "ws://$host:$port?token=$token" else "ws://$host:$port"
+        val deviceModel = android.net.Uri.encode(android.os.Build.MODEL)
+        val url = if (token != null) "ws://$host:$port?token=$token&device=$deviceModel" else "ws://$host:$port?device=$deviceModel"
         DebugLog.d(TAG, "连接 WebSocket: $url")
 
         val request = Request.Builder().url(url).build()
