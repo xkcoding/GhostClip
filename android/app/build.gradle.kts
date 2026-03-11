@@ -15,16 +15,26 @@ android {
         versionName = "0.1.0"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("ghostclip.keystore")
+            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "ghostclip"
+            keyAlias = System.getenv("KEY_ALIAS") ?: "ghostclip"
+            keyPassword = System.getenv("KEY_PASSWORD") ?: "ghostclip"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
     applicationVariants.all {
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            output.outputFileName = "GhostClip-${buildType.name}.apk"
+            output.outputFileName = "GhostClip-v${versionName}.apk"
         }
     }
 
