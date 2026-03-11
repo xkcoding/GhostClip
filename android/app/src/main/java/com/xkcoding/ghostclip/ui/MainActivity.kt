@@ -260,25 +260,43 @@ class MainActivity : AppCompatActivity() {
     private fun updatePairingUI() {
         when (PairingManager.state) {
             PairingManager.State.UNPAIRED -> {
+                // 红色主题卡片 + 绿色扫码按钮
+                statusCard.setBackgroundResource(R.drawable.bg_status_card_disconnected)
+                statusDot.setBackgroundResource(R.drawable.circle_error)
+                statusText.text = getString(R.string.status_unpaired)
+                statusText.setTextColor(ContextCompat.getColor(this, R.color.error))
+                deviceInfo.visibility = View.GONE
                 btnPairAction.text = getString(R.string.btn_scan_pair)
                 btnPairAction.setBackgroundResource(R.drawable.bg_btn_accent)
+                btnPairAction.setTextColor(ContextCompat.getColor(this, R.color.text_on_accent))
                 btnPairAction.visibility = View.VISIBLE
-                updateConnectionUI("DISCONNECTED", "", "")
             }
             PairingManager.State.CONNECTING -> {
+                statusCard.setBackgroundResource(R.drawable.bg_status_card_disconnected)
+                statusDot.setBackgroundResource(R.drawable.circle_warning)
+                statusText.text = getString(R.string.status_connecting)
+                statusText.setTextColor(ContextCompat.getColor(this, R.color.warning_dark))
+                deviceInfo.visibility = View.GONE
                 btnPairAction.visibility = View.GONE
-                updateConnectionUI("CONNECTING", "", "")
             }
             PairingManager.State.CONNECTED -> {
                 btnPairAction.text = getString(R.string.btn_unpair)
-                btnPairAction.setBackgroundResource(R.drawable.bg_btn_error)
+                btnPairAction.setBackgroundResource(R.drawable.bg_btn_unpair)
+                btnPairAction.setTextColor(ContextCompat.getColor(this, R.color.error))
                 btnPairAction.visibility = View.VISIBLE
             }
             PairingManager.State.RECONNECTING -> {
+                statusCard.setBackgroundResource(R.drawable.bg_status_card_disconnected)
+                statusDot.setBackgroundResource(R.drawable.circle_warning)
+                statusText.text = getString(R.string.status_reconnecting)
+                statusText.setTextColor(ContextCompat.getColor(this, R.color.warning_dark))
+                deviceInfo.visibility = View.VISIBLE
+                deviceName.text = PairingManager.macDeviceName.ifEmpty { "Mac" }
+                connType.text = "重连中…"
                 btnPairAction.text = getString(R.string.btn_unpair)
-                btnPairAction.setBackgroundResource(R.drawable.bg_btn_error)
+                btnPairAction.setBackgroundResource(R.drawable.bg_btn_unpair)
+                btnPairAction.setTextColor(ContextCompat.getColor(this, R.color.error))
                 btnPairAction.visibility = View.VISIBLE
-                updateConnectionUI("RECONNECTING", PairingManager.macDeviceName, "")
             }
         }
     }

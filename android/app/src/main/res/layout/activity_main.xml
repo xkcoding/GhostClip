@@ -6,13 +6,20 @@
     android:orientation="vertical"
     android:fitsSystemWindows="true">
 
-    <!-- Header -->
+    <!-- Header (fixed) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="20dp">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@string/app_name"
+            android:src="@mipmap/ic_launcher" />
 
         <TextView
             android:layout_width="0dp"
@@ -43,134 +50,145 @@
         </FrameLayout>
     </LinearLayout>
 
-    <!-- Scrollable Content -->
-    <ScrollView
+    <!-- Connection Status Card (fixed, compact) -->
+    <LinearLayout
+        android:id="@+id/status_card"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_status_card_disconnected"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
         android:paddingHorizontal="20dp"
-        android:paddingBottom="24dp">
+        android:paddingVertical="16dp">
 
+        <!-- Status Indicator + Device Info (horizontal when connected) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <!-- Connection Status Card -->
-            <LinearLayout
-                android:id="@+id/status_card"
-                android:layout_width="match_parent"
+            <View
+                android:id="@+id/status_dot"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/circle_accent" />
+
+            <TextView
+                android:id="@+id/status_text"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_status_card_connected"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:padding="28dp">
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/status_disconnected"
+                android:textColor="@color/accent_dark"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <!-- Status Indicator -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+            <!-- 配对操作按钮 (compact, right-aligned) -->
+            <TextView
+                android:id="@+id/btn_pair_action"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_btn_accent"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="@string/btn_scan_pair"
+                android:textColor="@android:color/white"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
 
-                    <View
-                        android:id="@+id/status_dot"
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:background="@drawable/circle_accent" />
+        <!-- Device Info (below status line) -->
+        <LinearLayout
+            android:id="@+id/device_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
 
-                    <TextView
-                        android:id="@+id/status_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/status_disconnected"
-                        android:textColor="@color/accent_dark"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <!-- Device Info -->
-                <LinearLayout
-                    android:id="@+id/device_info"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:id="@+id/device_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/conn_type"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <!-- 配对操作按钮 -->
-                <TextView
-                    android:id="@+id/btn_pair_action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/bg_btn_accent"
-                    android:gravity="center"
-                    android:paddingHorizontal="24dp"
-                    android:text="@string/btn_scan_pair"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-medium" />
-            </LinearLayout>
-
-            <!-- Recent Syncs Section -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/device_name"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:orientation="vertical">
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
 
-                <!-- Section Header -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="6dp"
+                android:text="·"
+                android:textColor="@color/text_tertiary"
+                android:textSize="14sp" />
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/recent_syncs"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+            <TextView
+                android:id="@+id/conn_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/sync_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_tertiary"
-                        android:textSize="13sp" />
-                </LinearLayout>
+    <!-- Recent Syncs Section (expandable, scrollable) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp">
+
+        <!-- Section Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/recent_syncs"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/sync_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_tertiary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Sync List (scrollable) -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false"
+            android:fillViewport="true">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <!-- Sync List Card -->
                 <LinearLayout
                     android:id="@+id/sync_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
                     android:background="@drawable/bg_card"
                     android:clipChildren="true"
                     android:clipToPadding="true"
@@ -181,7 +199,6 @@
                     android:id="@+id/empty_state"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
                     android:background="@drawable/bg_card"
                     android:gravity="center"
                     android:orientation="vertical"
@@ -210,70 +227,73 @@
                         android:textColor="@color/text_tertiary"
                         android:textSize="12sp" />
                 </LinearLayout>
-            </LinearLayout>
+            </FrameLayout>
+        </ScrollView>
+    </LinearLayout>
 
-            <!-- Debug Log Section -->
-            <LinearLayout
+    <!-- Debug Log Section (fixed height, bottom) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp">
+
+        <!-- Section Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="调试日志"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/btn_copy_logs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="复制"
+                android:textColor="@color/accent"
+                android:textSize="12sp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp" />
+
+            <TextView
+                android:id="@+id/btn_clear_logs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="清除"
+                android:textColor="@color/text_tertiary"
+                android:textSize="12sp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp" />
+        </LinearLayout>
+
+        <!-- Log Content (compact, fixed height) -->
+        <ScrollView
+            android:id="@+id/log_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_card"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/log_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:orientation="vertical">
-
-                <!-- Section Header -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="\u8C03\u8BD5\u65E5\u5FD7"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/btn_copy_logs"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="复制"
-                        android:textColor="@color/accent"
-                        android:textSize="13sp"
-                        android:padding="8dp" />
-
-                    <TextView
-                        android:id="@+id/btn_clear_logs"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="\u6E05\u9664"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="13sp"
-                        android:padding="8dp" />
-                </LinearLayout>
-
-                <!-- Log Content -->
-                <ScrollView
-                    android:id="@+id/log_scroll"
-                    android:layout_width="match_parent"
-                    android:layout_height="280dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_card"
-                    android:padding="12dp">
-
-                    <TextView
-                        android:id="@+id/log_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="11sp"
-                        android:lineSpacingMultiplier="1.3" />
-                </ScrollView>
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+                android:fontFamily="monospace"
+                android:textColor="@color/text_tertiary"
+                android:textSize="10sp"
+                android:lineSpacingMultiplier="1.3" />
+        </ScrollView>
+    </LinearLayout>
 </LinearLayout>
