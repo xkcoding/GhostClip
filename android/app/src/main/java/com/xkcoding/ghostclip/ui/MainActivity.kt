@@ -62,9 +62,11 @@ class MainActivity : AppCompatActivity() {
             val macHash = data.getStringExtra(ScanActivity.EXTRA_MAC_HASH) ?: return@registerForActivityResult
             val token = data.getStringExtra(ScanActivity.EXTRA_TOKEN) ?: return@registerForActivityResult
             val device = data.getStringExtra(ScanActivity.EXTRA_DEVICE_NAME) ?: ""
+            val host = data.getStringExtra(ScanActivity.EXTRA_HOST)
+            val port = data.getIntExtra(ScanActivity.EXTRA_PORT, 0).takeIf { it > 0 }
 
-            DebugLog.d(TAG, "扫码结果: mac_hash=$macHash, device=$device")
-            val info = PairingInfo(macHash, token, device)
+            DebugLog.d(TAG, "扫码结果: mac_hash=$macHash, device=$device, host=$host, port=$port")
+            val info = PairingInfo(macHash, token, device, host, port)
 
             // 通知 NetworkCoordinator 启动配对连接
             GhostClipService.onScanResult(info)

@@ -159,11 +159,13 @@ class ScanActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.scan_success, Toast.LENGTH_SHORT).show()
         }
 
-        // 返回配对信息给调用方
+        // 返回配对信息给调用方（含 IP:Port fallback）
         val resultIntent = Intent().apply {
             putExtra(EXTRA_MAC_HASH, info.macHash)
             putExtra(EXTRA_TOKEN, info.token)
             putExtra(EXTRA_DEVICE_NAME, info.deviceName)
+            info.host?.let { putExtra(EXTRA_HOST, it) }
+            info.port?.let { putExtra(EXTRA_PORT, it) }
         }
         setResult(RESULT_OK, resultIntent)
         finish()
@@ -179,5 +181,7 @@ class ScanActivity : AppCompatActivity() {
         const val EXTRA_MAC_HASH = "mac_hash"
         const val EXTRA_TOKEN = "token"
         const val EXTRA_DEVICE_NAME = "device_name"
+        const val EXTRA_HOST = "host"
+        const val EXTRA_PORT = "port"
     }
 }
