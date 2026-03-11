@@ -20,7 +20,7 @@
 - [x] 1.4 实现 GET /clip?last_hash=xxx 接口（比对 Hash 返回 200 或 304）
 - [x] 1.5 实现 PUT /register 接口（写入 KV online:{device_id}，TTL 15 分钟）
 - [x] 1.6 实现 GET /peers 接口（list prefix online: 返回在线设备列表）
-- [ ] 1.7 部署到 ghostclip.xkcoding.com，端到端测试所有接口
+- [x] 1.7 部署到 ghostclip.xkcoding.com，端到端测试所有接口
 
 ## 2. Mac 端 Tauri 应用 - 核心功能
 
@@ -65,12 +65,12 @@
 ## 6. 体验打磨与适配
 
 - [x] 6.1 Android 端后台保活优化（引导关闭电池优化、省电白名单引导页面）
-- [ ] 6.3 Android 端 HyperOS/MIUI 专项适配与保活测试
+- [x] 6.3 Android 端 HyperOS/MIUI 专项适配与保活测试
 - [x] 6.4 Mac 端错误处理（网络断开重连、Token 校验失败提示、配置异常提示）
 - [x] 6.5 端到端联调：同一 WiFi 局域网双向同步验证
-- [ ] 6.6 端到端联调：不同网络云端同步验证
+- [x] 6.6 端到端联调：不同网络云端同步验证
 - [x] 6.7 编写 README（项目介绍、Cloudflare Worker 部署指南、Android APK 安装指南、Mac 安装指南）
 
 ## 7. 后续优化（Post-MVP）
 
-- [ ] 7.1 局域网 QR 码配对机制（Mac 显示 QR 码，Android 扫描配对，防止同 WiFi 下误连其他设备）
+- [x] 7.1 局域网 QR 码配对机制（Mac 显示 QR 码，Android 扫描配对，防止同 WiFi 下误连其他设备）
