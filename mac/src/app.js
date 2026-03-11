@@ -231,7 +231,10 @@ function renderDropdown() {
         <div class="debug-section">
           <div class="debug-header">
             <span class="section-label">\u8C03\u8BD5\u65E5\u5FD7</span>
-            <span class="debug-clear" data-action="clear-logs">\u6E05\u9664</span>
+            <div style="display:flex;gap:8px;">
+              <span class="debug-clear" data-action="copy-logs">\u590D\u5236</span>
+              <span class="debug-clear" data-action="clear-logs">\u6E05\u9664</span>
+            </div>
           </div>
           <div class="debug-logs" id="debug-logs">${state.debugLogs.length === 0 ?
             '<span class="debug-empty">\u6682\u65E0\u65E5\u5FD7</span>' :
@@ -339,8 +342,10 @@ function renderQrPopup() {
       </div>
   `;
 
+  const popupClass = isSettingsWindow ? 'active settings-embedded' : 'active';
+
   return `
-    <div id="qr-popup" class="active">
+    <div id="qr-popup" class="${popupClass}">
       ${titleBarHtml}
       <div class="qr-title-divider"></div>
       <div class="qr-body">
@@ -406,6 +411,12 @@ function attachEventListeners() {
         break;
       case 'copy-recent':
         handleCopyRecent(actionEl);
+        break;
+      case 'copy-logs':
+        if (state.debugLogs.length > 0) {
+          const logsText = state.debugLogs.join('\n');
+          navigator.clipboard.writeText(logsText).catch(() => {});
+        }
         break;
       case 'clear-logs':
         state.debugLogs = [];

@@ -671,6 +671,10 @@ html, body {
   overflow: hidden;
 }
 
+#qr-popup.settings-embedded {
+  border-radius: 0;
+}
+
 #qr-popup.active {
   display: flex;
 }
@@ -684,6 +688,10 @@ html, body {
   background: var(--bg-secondary);
   flex-shrink: 0;
   -webkit-app-region: drag;
+}
+
+#qr-popup.settings-embedded .qr-title-bar {
+  height: 36px;
 }
 
 .qr-title-bar .traffic-lights {

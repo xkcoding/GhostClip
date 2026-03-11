@@ -454,7 +454,7 @@ class MainActivity : AppCompatActivity() {
                 iconDir.setColorFilter(ContextCompat.getColor(this, R.color.warning))
             }
 
-            textContent.text = record.text
+            textContent.text = record.text.trim().replace(Regex("\\s+"), " ")
             val timeAgo = formatTimeAgo(record.timestamp)
             val sourceLabel = if (isIncoming) {
                 getString(R.string.from_device, record.source)
