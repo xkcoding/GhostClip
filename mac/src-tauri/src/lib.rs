@@ -201,6 +201,14 @@ async fn cmd_unpair(app: tauri::AppHandle) -> Result<(), String> {
     state.pairing.regenerate_token();
     state.pairing.set_waiting_pair();
 
+    // 发射连接状态变更事件到前端（解除配对 = 断开连接）
+    let _ = app.emit("connection-state-changed", serde_json::json!({
+        "state": "disconnected",
+        "deviceName": "",
+        "connectionLabel": "",
+        "error": ""
+    }));
+
     // 发射配对状态变更事件到前端
     let _ = app.emit("pairing-state-changed", serde_json::json!({
         "status": "waiting_pair",

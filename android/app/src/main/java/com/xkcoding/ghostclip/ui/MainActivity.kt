@@ -83,6 +83,7 @@ class MainActivity : AppCompatActivity() {
                     val connLabel = intent.getStringExtra("conn_label") ?: ""
                     DebugLog.d(TAG, "收到连接广播: state=$stateName, device=$device")
                     updateConnectionUI(stateName, device, connLabel)
+                    updatePairingUI()
                 }
                 ACTION_CLIP_SYNCED -> {
                     val text = intent.getStringExtra("text") ?: return

@@ -153,7 +153,7 @@ class NetworkCoordinator(
      */
     fun unpair() {
         DebugLog.d(TAG, "用户主动解除配对")
-        lanClient?.disconnect()
+        // 直接 reset，由 onPairingUnpaired() 统一清理 lanClient（避免 disconnect 触发异步重连）
         PairingManager.reset("用户主动解除")
     }
 
@@ -210,7 +210,10 @@ class NetworkCoordinator(
         nsdRefreshJob?.cancel()
         nsdDiscovery?.stopDiscovery()
         nsdDiscovery?.filterMacHash = null
-        lanClient?.disconnect()
+        // 先清除 listener 防止异步回调触发 scheduleReconnect，再 shutdown
+        lanClient?.listener = null
+        lanClient?.shutdown()
+        lanClient = null
         connectedMacName = ""
         connectedHost = ""
         connectedPort = 0
@@ -285,7 +288,7 @@ class NetworkCoordinator(
 
             override fun onKicked(reason: String) {
                 DebugLog.w(TAG, "被踢: $reason")
-                lanClient?.disconnect()
+                // 由 PairingManager.reset → onPairingUnpaired 统一清理 lanClient
                 PairingManager.reset("被踢: $reason")
                 // 广播通知 UI 层弹 Toast
                 context.sendBroadcast(Intent(ACTION_KICKED).apply {
@@ -296,7 +299,7 @@ class NetworkCoordinator(
 
             override fun onUnpaired() {
                 DebugLog.d(TAG, "对方解除配对")
-                lanClient?.disconnect()
+                // 由 PairingManager.reset → onPairingUnpaired 统一清理 lanClient
                 PairingManager.reset("对方解除配对")
             }
 
