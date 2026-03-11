@@ -163,15 +163,10 @@ class MainActivity : AppCompatActivity() {
             refreshSyncList()
         }
 
-        // 检查后台收到的远端剪贴板
+        // 检查后台收到的远端剪贴板 -- 无条件写入（pendingClip 来自远端，后台写入可能静默失败）
         NetworkCoordinator.consumePendingClip()?.let { pendingText ->
-            val currentClip = ClipboardHelper.read(this)
-            if (currentClip == null || currentClip.isBlank() || currentClip == pendingText) {
-                DebugLog.d(TAG, "前台写入 pending 远端剪贴板: ${pendingText.take(80)}")
-                ClipboardHelper.write(this, pendingText)
-            } else {
-                DebugLog.d(TAG, "跳过 pendingClip(用户已有新剪贴板内容: ${currentClip.take(40)})")
-            }
+            DebugLog.d(TAG, "前台写入 pending 远端剪贴板: ${pendingText.take(80)}")
+            ClipboardHelper.write(this, pendingText)
             GhostClipService.hashPool.checkAndRecord(pendingText)
         }
 
@@ -190,13 +185,8 @@ class MainActivity : AppCompatActivity() {
             DebugLog.d(TAG, "onWindowFocusChanged: hasFocus=true")
 
             NetworkCoordinator.consumePendingClip()?.let { pendingText ->
-                val currentClip = ClipboardHelper.read(this)
-                if (currentClip == null || currentClip.isBlank() || currentClip == pendingText) {
-                    DebugLog.d(TAG, "focus 时写入 pending 远端剪贴板: ${pendingText.take(80)}")
-                    ClipboardHelper.write(this, pendingText)
-                } else {
-                    DebugLog.d(TAG, "focus 跳过 pendingClip(用户已有新剪贴板内容)")
-                }
+                DebugLog.d(TAG, "focus 写入 pending 远端剪贴板: ${pendingText.take(80)}")
+                ClipboardHelper.write(this, pendingText)
                 GhostClipService.hashPool.checkAndRecord(pendingText)
             }
 
