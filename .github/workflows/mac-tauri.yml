@@ -44,6 +44,8 @@ jobs:
 
       - name: Build Tauri app
         working-directory: mac
+        env:
+          TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
         run: cargo tauri build
 
       - name: Upload .dmg artifact
