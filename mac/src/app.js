@@ -141,7 +141,7 @@ function renderDropdown() {
     <div class="dev-info">
       <div class="dev-row">
         <span class="icon">${icons.smartphone}</span>
-        <span class="dev-name">${escapeHtml(state.deviceName || 'Android')}</span>
+        <span class="dev-name">Android \u00B7 ${escapeHtml(state.deviceName || '\u672A\u77E5\u8BBE\u5907')}</span>
       </div>
       <div class="conn-row">
         <span class="icon ${connIconClass}">${icons[connIcon]}</span>
@@ -221,7 +221,7 @@ function renderDropdown() {
             <span class="text">\u914D\u5BF9\u2026</span>
           </div>
           `}
-          <div class="divider" style="margin: 0 -8px; width: calc(100% + 16px);"></div>
+          <div class="divider" style="margin: 0 -16px; width: calc(100% + 32px);"></div>
           <div class="action-row quit" data-action="quit">
             <span class="icon">${icons.power}</span>
             <span class="text">\u9000\u51FA GhostClip</span>
@@ -231,7 +231,10 @@ function renderDropdown() {
         <div class="debug-section">
           <div class="debug-header">
             <span class="section-label">\u8C03\u8BD5\u65E5\u5FD7</span>
-            <span class="debug-clear" data-action="clear-logs">\u6E05\u9664</span>
+            <div style="display:flex;gap:8px;">
+              <span class="debug-clear" data-action="copy-logs">\u590D\u5236</span>
+              <span class="debug-clear" data-action="clear-logs">\u6E05\u9664</span>
+            </div>
           </div>
           <div class="debug-logs" id="debug-logs">${state.debugLogs.length === 0 ?
             '<span class="debug-empty">\u6682\u65E0\u65E5\u5FD7</span>' :
@@ -320,26 +323,29 @@ function renderQrPopup() {
   const deviceLabel = state.macHash ? `${escapeHtml(state.deviceName || 'Mac')} \u00B7 gc-${escapeHtml(state.macHash)}` : '';
   const isSettingsWindow = window.location.hash === '#settings';
 
-  // Settings 窗口已有原生标题栏，不需要自定义 traffic lights
+  // Settings 窗口：返回按钮 + 居中标题；独立弹窗：标题 + 关闭按钮
   const titleBarHtml = isSettingsWindow ? `
       <div class="qr-title-bar">
-        <span class="qr-back-btn" data-action="close-qr">\u2190 \u8FD4\u56DE\u8BBE\u7F6E</span>
+        <span class="qr-back-btn" data-action="close-qr">
+          <span class="icon">${icons.arrowLeft}</span>
+          <span>\u8FD4\u56DE</span>
+        </span>
+        <span class="win-title">\u626B\u7801\u914D\u5BF9</span>
         <div class="win-spacer"></div>
       </div>
   ` : `
       <div class="qr-title-bar">
-        <div class="traffic-lights">
-          <div class="traffic-light red" data-action="close-qr"></div>
-          <div class="traffic-light yellow"></div>
-          <div class="traffic-light green"></div>
-        </div>
         <span class="win-title">\u626B\u7801\u914D\u5BF9</span>
-        <div class="win-spacer"></div>
+        <div class="qr-close-btn" data-action="close-qr">
+          <span class="icon">${icons.x}</span>
+        </div>
       </div>
   `;
 
+  const popupClass = isSettingsWindow ? 'active settings-embedded' : 'active';
+
   return `
-    <div id="qr-popup" class="active">
+    <div id="qr-popup" class="${popupClass}">
       ${titleBarHtml}
       <div class="qr-title-divider"></div>
       <div class="qr-body">
@@ -405,6 +411,12 @@ function attachEventListeners() {
         break;
       case 'copy-recent':
         handleCopyRecent(actionEl);
+        break;
+      case 'copy-logs':
+        if (state.debugLogs.length > 0) {
+          const logsText = state.debugLogs.join('\n');
+          navigator.clipboard.writeText(logsText).catch(() => {});
+        }
         break;
       case 'clear-logs':
         state.debugLogs = [];

@@ -6,6 +6,7 @@
     <string name="status_connected">已连接</string>
     <string name="status_cloud">云端同步</string>
     <string name="status_disconnected">未连接</string>
+    <string name="hint_unpaired">请使用扫码功能连接 Mac 设备</string>
     <string name="status_unpaired">未配对</string>
     <string name="status_searching">搜索中…</string>
     <string name="recent_syncs">最近同步</string>
@@ -70,7 +71,8 @@
 
     <!-- Scan QR -->
     <string name="scan_title">扫码配对</string>
-    <string name="scan_hint">将摄像头对准 Mac 端显示的二维码</string>
+    <string name="scan_hint">将 Mac 端显示的二维码放入框内</string>
+    <string name="scan_hint2">请确保两台设备在同一 WiFi</string>
     <string name="scan_back">返回</string>
     <string name="scan_invalid_qr">请扫描 GhostClip 配对二维码</string>
     <string name="scan_success">配对信息已获取，正在连接…</string>
@@ -79,9 +81,19 @@
     <!-- Notification -->
     <string name="notif_channel_name">GhostClip 同步服务</string>
     <string name="notif_running">GhostClip 运行中</string>
-    <string name="notif_connected_lan">已连接 %s (局域网)</string>
+    <string name="notif_connected_lan">已配对 %s (局域网)</string>
     <string name="notif_connected_cloud">云端同步中</string>
-    <string name="notif_disconnected">未连接到 Mac</string>
+    <string name="notif_disconnected">未配对 · 等待扫码</string>
     <string name="notif_pause">暂停同步</string>
     <string name="notif_disconnect">断开连接</string>
+    <string name="notif_clip_received">收到剪贴板内容</string>
+    <string name="notif_clip_from">来自 %1$s · %2$s</string>
+    <!-- Settings sections -->
+    <string name="section_pairing">设备配对</string>
+    <string name="section_permissions">权限状态</string>
+    <string name="section_about">关于</string>
+    <string name="pair_status_label">配对状态</string>
+    <string name="mac_id_label">MAC 标识</string>
+    <string name="pair_status_paired">已配对</string>
+    <string name="pair_status_unpaired">未配对</string>
 </resources>

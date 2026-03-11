@@ -12,7 +12,7 @@
         android:layout_height="56dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="20dp">
+        android:paddingHorizontal="24dp">
 
         <ImageView
             android:layout_width="32dp"
@@ -25,12 +25,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="@font/space_grotesk_semibold"
             android:letterSpacing="-0.02"
             android:text="@string/app_name"
             android:textColor="@color/text_primary"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textSize="22sp" />
 
         <FrameLayout
             android:id="@+id/btn_settings"
@@ -55,13 +54,13 @@
         android:id="@+id/status_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
+        android:layout_marginHorizontal="24dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/bg_status_card_disconnected"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="20dp">
 
         <!-- Status Indicator + Device Info (horizontal when connected) -->
         <LinearLayout
@@ -135,6 +134,18 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
         </LinearLayout>
+
+        <!-- 未配对提示 (unpaired hint) -->
+        <TextView
+            android:id="@+id/hint_unpaired"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/hint_unpaired"
+            android:textColor="@color/text_tertiary"
+            android:textSize="13sp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <!-- Recent Syncs Section (expandable, scrollable) -->
@@ -144,7 +155,7 @@
         android:layout_weight="1"
         android:layout_marginTop="16dp"
         android:orientation="vertical"
-        android:paddingHorizontal="20dp">
+        android:paddingHorizontal="24dp">
 
         <!-- Section Header -->
         <LinearLayout
@@ -157,11 +168,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="@font/space_grotesk_semibold"
                 android:text="@string/recent_syncs"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/sync_count"
@@ -176,7 +186,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:clipToPadding="false"
             android:fillViewport="true">
 
@@ -236,7 +246,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="20dp"
+        android:paddingHorizontal="24dp"
         android:paddingTop="12dp"
         android:paddingBottom="16dp">
 
@@ -283,8 +293,9 @@
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:layout_marginTop="6dp"
-            android:background="@drawable/bg_card"
-            android:padding="10dp">
+            android:background="@drawable/bg_debug_log"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="12dp">
 
             <TextView
                 android:id="@+id/log_text"
