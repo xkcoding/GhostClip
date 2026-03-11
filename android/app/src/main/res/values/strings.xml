@@ -6,6 +6,7 @@
     <string name="status_connected">已连接</string>
     <string name="status_cloud">云端同步</string>
     <string name="status_disconnected">未连接</string>
+    <string name="status_unpaired">未配对</string>
     <string name="status_searching">搜索中…</string>
     <string name="recent_syncs">最近同步</string>
     <string name="today_count">今日 %d 条</string>
@@ -49,6 +50,31 @@
     <string name="battery_guide_success">✓ 电池优化已关闭</string>
     <string name="battery_guide_skip">稍后再说</string>
     <string name="battery_guide_open_fail">无法打开设置</string>
+
+    <!-- Pairing -->
+    <string name="btn_scan_pair">扫码配对</string>
+    <string name="btn_unpair">解除配对</string>
+    <string name="status_connecting">连接中…</string>
+    <string name="status_reconnecting">重连中…</string>
+    <string name="kicked_toast">已被新设备替代，请重新扫码配对</string>
+    <string name="unpaired_toast">配对已解除</string>
+    <string name="copied_toast">已复制</string>
+    <string name="discovery_timeout_toast">请确保两台设备在同一 WiFi</string>
+    <string name="notif_clip_title">收到剪贴板</string>
+    <string name="notif_clip_copy">复制</string>
+    <string name="notif_waiting_pair">等待扫码配对</string>
+    <string name="notif_paired">已配对 %s</string>
+    <string name="notif_action_scan">扫码配对</string>
+    <string name="notif_action_unpair">解除配对</string>
+    <string name="notif_action_pause">暂停同步</string>
+
+    <!-- Scan QR -->
+    <string name="scan_title">扫码配对</string>
+    <string name="scan_hint">将摄像头对准 Mac 端显示的二维码</string>
+    <string name="scan_back">返回</string>
+    <string name="scan_invalid_qr">请扫描 GhostClip 配对二维码</string>
+    <string name="scan_success">配对信息已获取，正在连接…</string>
+    <string name="camera_permission_denied">需要相机权限才能扫码配对</string>
 
     <!-- Notification -->
     <string name="notif_channel_name">GhostClip 同步服务</string>

@@ -1,0 +1,186 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-mac:
+    name: Build Mac
+    runs-on: macos-latest
+    outputs:
+      dmg_name: ${{ steps.find_dmg.outputs.name }}
+      dmg_sha256: ${{ steps.sha.outputs.sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin
+            mac/src-tauri/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('mac/src-tauri/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Install Tauri CLI
+        run: command -v cargo-tauri >/dev/null 2>&1 || cargo install tauri-cli --version "^2.0.0" --locked
+
+      - name: Cargo test
+        working-directory: mac/src-tauri
+        run: cargo test -- --test-threads=1
+
+      - name: Clean stale bundle cache
+        run: rm -rf mac/src-tauri/target/release/bundle
+
+      - name: Build Tauri app
+        working-directory: mac
+        run: cargo tauri build
+
+      - name: Find DMG
+        id: find_dmg
+        run: |
+          DMG=$(ls mac/src-tauri/target/release/bundle/dmg/*.dmg)
+          echo "path=$DMG" >> "$GITHUB_OUTPUT"
+          echo "name=$(basename $DMG)" >> "$GITHUB_OUTPUT"
+
+      - name: Calculate SHA256
+        id: sha
+        run: |
+          SHA=$(shasum -a 256 ${{ steps.find_dmg.outputs.path }} | awk '{print $1}')
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghostclip-mac-dmg
+          path: ${{ steps.find_dmg.outputs.path }}
+
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Generate Gradle Wrapper
+        working-directory: android
+        run: gradle wrapper
+
+      - name: Build Debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghostclip-android-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+  release:
+    name: Create Release & Update Tap
+    needs: [build-mac, build-android]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Mac DMG
+        uses: actions/download-artifact@v4
+        with:
+          name: ghostclip-mac-dmg
+          path: artifacts/
+
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: ghostclip-android-apk
+          path: artifacts/
+
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Determine pre-release flag
+        id: prerelease
+        run: |
+          TAG="${{ github.ref_name }}"
+          if [[ "$TAG" == *alpha* || "$TAG" == *beta* || "$TAG" == *rc* ]]; then
+            echo "flag=--prerelease" >> "$GITHUB_OUTPUT"
+          else
+            echo "flag=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --repo "${{ github.repository }}" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes \
+            ${{ steps.prerelease.outputs.flag }} \
+            artifacts/*
+
+      - name: Update Homebrew Tap
+        env:
+          GH_TOKEN: ${{ secrets.TAP_TOKEN }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          SHA256="${{ needs.build-mac.outputs.dmg_sha256 }}"
+          DMG_NAME="${{ needs.build-mac.outputs.dmg_name }}"
+
+          cat > /tmp/ghostclip.rb <<RUBY
+          cask "ghostclip" do
+            version "${VERSION}"
+            sha256 "${SHA256}"
+
+            url "https://github.com/xkcoding/GhostClip/releases/download/v#{version}/${DMG_NAME}"
+            name "GhostClip"
+            desc "Android <-> Mac clipboard sync tool"
+            homepage "https://github.com/xkcoding/GhostClip"
+
+            depends_on macos: ">= :ventura"
+
+            app "GhostClip.app"
+          end
+          RUBY
+
+          # Get existing file SHA (for update)
+          EXISTING_SHA=$(gh api repos/xkcoding/homebrew-tap/contents/Casks/ghostclip.rb --jq '.sha' 2>/dev/null || echo "")
+          CONTENT=$(base64 -w0 /tmp/ghostclip.rb)
+
+          ARGS=(
+            --method PUT
+            --field "message=feat: update GhostClip to v${VERSION}"
+            --field "content=${CONTENT}"
+            --field "committer[name]=Yangkai.Shen"
+            --field "committer[email]=237497819@qq.com"
+            --field "author[name]=Yangkai.Shen"
+            --field "author[email]=237497819@qq.com"
+          )
+
+          if [ -n "$EXISTING_SHA" ]; then
+            ARGS+=(--field "sha=${EXISTING_SHA}")
+          fi
+
+          gh api repos/xkcoding/homebrew-tap/contents/Casks/ghostclip.rb "${ARGS[@]}"

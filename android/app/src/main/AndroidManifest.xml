@@ -9,6 +9,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
         android:allowBackup="false"
@@ -19,6 +22,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GhostClip"
         tools:targetApi="35">
+
+        <!-- ICP 备案信息 -->
+        <meta-data
+            android:name="ICP_LICENSE"
+            android:value="浙ICP备15019787号-1" />
+        <meta-data
+            android:name="SECURITY_LICENSE"
+            android:value="浙公网安备33011002018177号" />
 
         <!-- 主界面 -->
         <activity
@@ -45,10 +56,25 @@
             </intent-filter>
         </activity>
 
+        <!-- 透明剪贴板写入（后台收到远端内容时启动） -->
+        <activity
+            android:name=".ui.ClipWriteActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GhostClip.Transparent"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:noHistory="true" />
+
         <!-- 电池优化引导 -->
         <activity
             android:name=".ui.BatteryGuideActivity"
             android:exported="false" />
+
+        <!-- 扫码配对 -->
+        <activity
+            android:name=".ui.ScanActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <!-- 设置界面 -->
         <activity
@@ -64,6 +90,11 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="clipboard_sync" />
         </service>
+
+        <!-- 通知复制按钮接收器 -->
+        <receiver
+            android:name=".service.GhostClipService$CopyReceiver"
+            android:exported="false" />
 
     </application>
 

@@ -47,6 +47,14 @@ class QuickSyncActivity : AppCompatActivity() {
         if (synced) return
         synced = true
 
+        // 未连接时不读取剪贴板
+        if (com.xkcoding.ghostclip.net.PairingManager.state != com.xkcoding.ghostclip.net.PairingManager.State.CONNECTED) {
+            DebugLog.d(TAG, "未连接, 跳过同步")
+            Toast.makeText(this, "未连接到 Mac，请先扫码配对", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
         val text = ClipboardHelper.read(this)
         if (text.isNullOrBlank()) {
             DebugLog.d(TAG, "\u526a\u8d34\u677f\u4e3a\u7a7a")

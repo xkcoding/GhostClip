@@ -146,9 +146,9 @@ impl CloudClient {
         &self,
         last_hash: Option<&str>,
     ) -> Result<Option<ClipRecord>, CloudError> {
-        let mut url = format!("{}/clip", self.base_url);
+        let mut url = format!("{}/clip?device_id={}", self.base_url, self.device_id);
         if let Some(hash) = last_hash {
-            url = format!("{}?last_hash={}", url, hash);
+            url = format!("{}&last_hash={}", url, hash);
         }
 
         let resp = self

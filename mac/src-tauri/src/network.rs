@@ -1,6 +1,7 @@
 use crate::cloud_client::{CloudClient, CloudError, ClipRecord};
 use crate::hash_pool::{md5_hash, HashPool};
 use crate::mdns::MdnsService;
+use crate::pairing::PairingManager;
 use crate::presence::{PresenceMode, PresenceStateMachine};
 use crate::ws_server::{ClipMessage, WsConnectionEvent, WsServer};
 use std::sync::Arc;
@@ -34,10 +35,13 @@ pub struct NetworkManager {
     cloud_client: Option<Arc<CloudClient>>,
     presence: Arc<PresenceStateMachine>,
     hash_pool: Arc<HashPool>,
+    pairing: Arc<PairingManager>,
     _mdns: Option<MdnsService>,
     has_cloud: bool,
     state_tx: watch::Sender<ConnectionState>,
     state_rx: watch::Receiver<ConnectionState>,
+    /// 所有后台任务 handle，shutdown 时 abort
+    task_handles: std::sync::Mutex<Vec<tokio::task::JoinHandle<()>>>,
 }
 
 /// 网络管理器配置
@@ -46,6 +50,7 @@ pub struct NetworkConfig {
     pub cloud_url: Option<String>,
     pub cloud_token: Option<String>,
     pub device_id: String,
+    pub pairing: Arc<PairingManager>,
 }
 
 impl NetworkManager {
@@ -60,12 +65,14 @@ impl NetworkManager {
         let (ws_incoming_tx, mut ws_incoming_rx) = mpsc::channel::<ClipMessage>(32);
         let (conn_event_tx, mut conn_event_rx) = mpsc::channel::<WsConnectionEvent>(32);
 
-        // 启动 WebSocket Server
-        let ws_server = Arc::new(WsServer::new(config.ws_port, ws_incoming_tx, conn_event_tx));
-        let actual_port = ws_server.start().await?;
+        // 启动 WebSocket Server（带 token 鉴权）
+        let ws_server = Arc::new(WsServer::new(config.ws_port, config.pairing.clone(), ws_incoming_tx, conn_event_tx));
+        let (actual_port, ws_handle) = ws_server.start().await?;
+        let mut task_handles: Vec<tokio::task::JoinHandle<()>> = vec![ws_handle];
 
-        // 注册 mDNS 服务
-        let mdns = match MdnsService::register(actual_port, &config.device_id) {
+        // 注册 mDNS 服务（使用 mac_hash 作为实例标识）
+        let pairing = config.pairing.clone();
+        let mdns = match MdnsService::register(actual_port, pairing.mac_hash(), &config.device_id) {
             Ok(m) => {
                 log::info!("mDNS 服务注册成功");
                 Some(m)
@@ -108,12 +115,13 @@ impl NetworkManager {
         // 启动云端轮询状态机
         if let Some(ref client) = cloud_client {
             let (cloud_clip_tx, mut cloud_clip_rx) = mpsc::channel::<ClipRecord>(32);
-            presence.start(client.clone(), cloud_clip_tx, error_tx);
+            let presence_handle = presence.start(client.clone(), cloud_clip_tx, error_tx);
+            task_handles.push(presence_handle);
 
             // 处理从云端收到的剪贴板内容
             let hash_pool_cloud = hash_pool.clone();
             let on_receive_cloud = on_receive.clone();
-            tokio::spawn(async move {
+            task_handles.push(tokio::spawn(async move {
                 while let Some(record) = cloud_clip_rx.recv().await {
                     // 去重检查
                     if hash_pool_cloud.check_and_insert(&record.text).is_some() {
@@ -123,13 +131,13 @@ impl NetworkManager {
                         log::debug!("云端接收 - 内容重复，跳过");
                     }
                 }
-            });
+            }));
         }
 
         // 处理从 WebSocket 收到的剪贴板内容
         let hash_pool_ws = hash_pool.clone();
         let on_receive_ws = on_receive.clone();
-        tokio::spawn(async move {
+        task_handles.push(tokio::spawn(async move {
             while let Some(clip_msg) = ws_incoming_rx.recv().await {
                 // 去重检查
                 if hash_pool_ws.check_and_insert(&clip_msg.text).is_some() {
@@ -139,7 +147,7 @@ impl NetworkManager {
                     log::debug!("局域网接收 - 内容重复，跳过");
                 }
             }
-        });
+        }));
 
         // 初始状态：有云端则 Cloud，否则 Disconnected（LAN 需要等 WS 客户端连接）
         let initial_state = if cloud_client.is_some() {
@@ -154,7 +162,7 @@ impl NetworkManager {
         let state_tx_for_events = state_tx.clone();
         let ws_server_for_events = ws_server.clone();
         let has_cloud_for_events = has_cloud;
-        tokio::spawn(async move {
+        task_handles.push(tokio::spawn(async move {
             while let Some(event) = conn_event_rx.recv().await {
                 let client_count = ws_server_for_events.client_count().await;
                 let new_state = match event {
@@ -175,17 +183,19 @@ impl NetworkManager {
                 };
                 let _ = state_tx_for_events.send(new_state);
             }
-        });
+        }));
 
         Ok(Self {
             ws_server,
             cloud_client,
             presence,
             hash_pool,
+            pairing,
             _mdns: mdns,
             has_cloud,
             state_tx,
             state_rx,
+            task_handles: std::sync::Mutex::new(task_handles),
         })
     }
 
@@ -201,6 +211,7 @@ impl NetworkManager {
         // 尝试局域网发送
         if self.ws_server.client_count().await > 0 {
             let msg = ClipMessage {
+                msg_type: "clip".to_string(),
                 device_id: device_id.to_string(),
                 text: text.to_string(),
                 hash: hash.clone(),
@@ -216,6 +227,8 @@ impl NetworkManager {
 
         // 云端回退
         if let Some(ref client) = self.cloud_client {
+            // 发送时顺便注册，确保对端 IDLE 检查能发现自己
+            let _ = client.register().await;
             match client.post_clip(text, &hash).await {
                 Ok(resp) => {
                     log::info!("云端发送成功, 状态: {}, 哈希: {}", resp.status, resp.hash);
@@ -246,9 +259,28 @@ impl NetworkManager {
         let _ = self.state_tx.send(state);
     }
 
+    /// 获取配对管理器
+    pub fn pairing(&self) -> &Arc<PairingManager> {
+        &self.pairing
+    }
+
+    /// 向已配对设备发送 unpair 消息并断开连接
+    pub async fn send_unpair_and_disconnect(&self) {
+        self.ws_server.send_unpair_and_disconnect().await;
+    }
+
     /// 获取当前 presence 模式
     pub fn presence_mode(&self) -> PresenceMode {
         self.presence.mode()
+    }
+
+    /// 关闭所有后台任务，释放端口等资源
+    pub fn shutdown(&self) {
+        let mut handles = self.task_handles.lock().unwrap();
+        log::info!("正在关闭网络服务（abort {} 个任务）...", handles.len());
+        for handle in handles.drain(..) {
+            handle.abort();
+        }
     }
 
     /// 获取 WebSocket 客户端数量

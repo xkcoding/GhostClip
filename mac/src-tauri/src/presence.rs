@@ -21,10 +21,10 @@ impl std::fmt::Display for PresenceMode {
     }
 }
 
-const IDLE_PEER_CHECK_INTERVAL: Duration = Duration::from_secs(30);
-const POLL_CLIP_INTERVAL: Duration = Duration::from_secs(3);
+const IDLE_PEER_CHECK_INTERVAL: Duration = Duration::from_secs(10);
+const POLL_CLIP_INTERVAL: Duration = Duration::from_secs(2);
 const POLL_HEARTBEAT_INTERVAL: Duration = Duration::from_secs(600); // 10 分钟
-const POLL_PEER_CHECK_INTERVAL: Duration = Duration::from_secs(60); // 1 分钟
+const POLL_PEER_CHECK_INTERVAL: Duration = Duration::from_secs(30); // 30 秒
 
 /// 设备在线感知状态机
 pub struct PresenceStateMachine {
@@ -47,13 +47,13 @@ impl PresenceStateMachine {
         self.mode_rx.clone()
     }
 
-    /// 启动状态机主循环
+    /// 启动状态机主循环，返回任务 Handle
     pub fn start(
         &self,
         cloud_client: Arc<CloudClient>,
         clip_callback: tokio::sync::mpsc::Sender<crate::cloud_client::ClipRecord>,
         error_tx: tokio::sync::mpsc::Sender<CloudError>,
-    ) {
+    ) -> tokio::task::JoinHandle<()> {
         let mode_tx = self.mode_tx.clone();
         let mode_rx = self.mode_rx.clone();
 
@@ -218,6 +218,6 @@ impl PresenceStateMachine {
                     }
                 }
             }
-        });
+        })
     }
 }
