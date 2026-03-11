@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var deviceName: TextView
     private lateinit var connType: TextView
     private lateinit var btnPairAction: TextView
+    private lateinit var hintUnpaired: TextView
     private lateinit var syncList: LinearLayout
     private lateinit var emptyState: LinearLayout
     private lateinit var syncCount: TextView
@@ -209,6 +210,7 @@ class MainActivity : AppCompatActivity() {
         deviceName = findViewById(R.id.device_name)
         connType = findViewById(R.id.conn_type)
         btnPairAction = findViewById(R.id.btn_pair_action)
+        hintUnpaired = findViewById(R.id.hint_unpaired)
         syncList = findViewById(R.id.sync_list)
         emptyState = findViewById(R.id.empty_state)
         syncCount = findViewById(R.id.sync_count)
@@ -266,6 +268,7 @@ class MainActivity : AppCompatActivity() {
                 statusText.text = getString(R.string.status_unpaired)
                 statusText.setTextColor(ContextCompat.getColor(this, R.color.error))
                 deviceInfo.visibility = View.GONE
+                hintUnpaired.visibility = View.VISIBLE
                 btnPairAction.text = getString(R.string.btn_scan_pair)
                 btnPairAction.setBackgroundResource(R.drawable.bg_btn_accent)
                 btnPairAction.setTextColor(ContextCompat.getColor(this, R.color.text_on_accent))
@@ -277,9 +280,11 @@ class MainActivity : AppCompatActivity() {
                 statusText.text = getString(R.string.status_connecting)
                 statusText.setTextColor(ContextCompat.getColor(this, R.color.warning_dark))
                 deviceInfo.visibility = View.GONE
+                hintUnpaired.visibility = View.GONE
                 btnPairAction.visibility = View.GONE
             }
             PairingManager.State.CONNECTED -> {
+                hintUnpaired.visibility = View.GONE
                 btnPairAction.text = getString(R.string.btn_unpair)
                 btnPairAction.setBackgroundResource(R.drawable.bg_btn_unpair)
                 btnPairAction.setTextColor(ContextCompat.getColor(this, R.color.error))
@@ -290,6 +295,7 @@ class MainActivity : AppCompatActivity() {
                 statusDot.setBackgroundResource(R.drawable.circle_warning)
                 statusText.text = getString(R.string.status_reconnecting)
                 statusText.setTextColor(ContextCompat.getColor(this, R.color.warning_dark))
+                hintUnpaired.visibility = View.GONE
                 deviceInfo.visibility = View.VISIBLE
                 deviceName.text = PairingManager.macDeviceName.ifEmpty { "Mac" }
                 connType.text = "重连中…"

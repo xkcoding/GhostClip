@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.xkcoding.ghostclip.R
+import com.xkcoding.ghostclip.net.PairingManager
 import com.xkcoding.ghostclip.service.GhostClipService
 
 /**
@@ -42,6 +43,7 @@ class SettingsActivity : AppCompatActivity() {
         initialCloudEnabled = prefs.getBoolean("cloud_enabled", false)
 
         setupBackButton()
+        setupPairingSection()
         setupCloudSection()
         setupPermissionsSection()
         setupAboutSection()
@@ -49,6 +51,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        updatePairingInfo()
         updatePermissionBadges()
     }
 
@@ -60,6 +63,37 @@ class SettingsActivity : AppCompatActivity() {
     private fun setupBackButton() {
         findViewById<ImageView>(R.id.btn_back).setOnClickListener {
             finish()
+        }
+    }
+
+    private fun setupPairingSection() {
+        findViewById<LinearLayout>(R.id.row_unpair).setOnClickListener {
+            if (PairingManager.state == PairingManager.State.CONNECTED ||
+                PairingManager.state == PairingManager.State.RECONNECTING
+            ) {
+                GhostClipService.unpair()
+                Toast.makeText(this, R.string.unpaired_toast, Toast.LENGTH_SHORT).show()
+                updatePairingInfo()
+            }
+        }
+    }
+
+    private fun updatePairingInfo() {
+        val statusValue = findViewById<TextView>(R.id.pair_status_value)
+        val macIdValue = findViewById<TextView>(R.id.mac_id_value)
+
+        val isPaired = PairingManager.state == PairingManager.State.CONNECTED ||
+            PairingManager.state == PairingManager.State.RECONNECTING ||
+            PairingManager.state == PairingManager.State.CONNECTING
+
+        if (isPaired) {
+            statusValue.text = getString(R.string.pair_status_paired)
+            statusValue.setTextColor(ContextCompat.getColor(this, R.color.accent_dark))
+            macIdValue.text = PairingManager.macHash?.take(8) ?: "--"
+        } else {
+            statusValue.text = getString(R.string.pair_status_unpaired)
+            statusValue.setTextColor(ContextCompat.getColor(this, R.color.text_tertiary))
+            macIdValue.text = "--"
         }
     }
 

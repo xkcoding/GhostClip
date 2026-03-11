@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:paddingHorizontal="14dp"
+    android:paddingVertical="16dp">
 
     <!-- Direction Icon -->
     <FrameLayout
@@ -38,7 +39,7 @@
             android:fontFamily="sans-serif-medium"
             android:maxLines="1"
             android:textColor="@color/text_primary"
-            android:textSize="15sp" />
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/text_time"
@@ -46,6 +47,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:textColor="@color/text_tertiary"
-            android:textSize="13sp" />
+            android:textSize="11sp" />
     </LinearLayout>
 </LinearLayout>

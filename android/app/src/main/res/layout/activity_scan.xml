@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- 半透明遮罩 + 扫描框（简单实现：上下提示文字） -->
+    <!-- 半透明遮罩 + 扫描框 + 提示 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -24,27 +24,43 @@
             android:layout_weight="1"
             android:background="#80000000" />
 
-        <!-- 扫描区域（透明） -->
+        <!-- 扫描区域（260x260, 圆角 16, 白色边框 3px） -->
         <FrameLayout
             android:layout_width="260dp"
             android:layout_height="260dp">
 
-            <!-- 四角边框装饰 -->
+            <!-- 边框装饰 -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/scan_frame" />
+
+            <!-- 扫描线 (#22C55E 2dp) -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginHorizontal="16dp"
+                android:background="@color/accent" />
         </FrameLayout>
 
-        <!-- 提示文字 -->
+        <!-- 提示文案 -->
         <TextView
             android:id="@+id/scan_hint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/scan_hint"
-            android:textColor="@android:color/white"
-            android:textSize="15sp" />
+            android:textColor="#ffffffb3"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/scan_hint2"
+            android:textColor="#ffffff66"
+            android:textSize="12sp" />
 
         <!-- 底部区域 -->
         <View
@@ -54,28 +70,34 @@
             android:background="#80000000" />
     </LinearLayout>
 
-    <!-- 返回按钮 -->
-    <ImageView
-        android:id="@+id/btn_back"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="40dp"
-        android:padding="12dp"
-        android:src="@drawable/ic_arrow_back"
-        android:contentDescription="@string/scan_back"
-        android:tint="@android:color/white"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+    <!-- Header: ← 返回 + 标题 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="36dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp">
 
-    <!-- 标题 -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="52dp"
-        android:text="@string/scan_title"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/scan_back"
+            android:src="@drawable/ic_arrow_left"
+            android:tint="@android:color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:fontFamily="@font/space_grotesk_semibold"
+            android:letterSpacing="-0.02"
+            android:text="@string/scan_title"
+            android:textColor="@android:color/white"
+            android:textSize="24sp" />
+    </LinearLayout>
 
 </FrameLayout>

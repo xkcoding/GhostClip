@@ -167,7 +167,7 @@ class GhostClipService : LifecycleService() {
 
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("GhostClip")
+            .setContentTitle(getString(R.string.notif_running))
             .setContentIntent(contentIntent)
             .setOngoing(true)
             .setSilent(true)
@@ -175,9 +175,19 @@ class GhostClipService : LifecycleService() {
         val pairingState = PairingManager.state
 
         if (pairingState == PairingManager.State.CONNECTED && state == ConnectionState.LAN) {
-            // 已配对
+            // 已配对 -- "已配对 {设备名} (局域网)"
             val deviceLabel = PairingManager.macDeviceName.ifEmpty { "Mac" }
-            builder.setContentText(getString(R.string.notif_paired, deviceLabel))
+            builder.setContentText(getString(R.string.notif_connected_lan, deviceLabel))
+
+            // 暂停同步 action
+            val pauseIntent = Intent(this, GhostClipService::class.java).apply {
+                putExtra(EXTRA_UNPAIR, true) // 暂时复用 unpair
+            }
+            val pausePi = PendingIntent.getService(
+                this, 3, pauseIntent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            builder.addAction(0, getString(R.string.notif_action_pause), pausePi)
 
             // 解除配对 action
             val unpairIntent = Intent(this, GhostClipService::class.java).apply {
@@ -189,8 +199,8 @@ class GhostClipService : LifecycleService() {
             )
             builder.addAction(0, getString(R.string.notif_action_unpair), unpairPi)
         } else if (pairingState == PairingManager.State.UNPAIRED) {
-            // 未配对
-            builder.setContentText(getString(R.string.notif_waiting_pair))
+            // 未配对 -- "未配对 · 等待扫码"
+            builder.setContentText(getString(R.string.notif_disconnected))
 
             // 扫码配对 action
             val scanIntent = Intent(this, ScanActivity::class.java)
@@ -212,6 +222,8 @@ class GhostClipService : LifecycleService() {
      */
     private fun showClipNotification(text: String) {
         val preview = if (text.length > 100) text.take(100) + "…" else text
+        val deviceLabel = PairingManager.macDeviceName.ifEmpty { "Mac" }
+        val body = getString(R.string.notif_clip_from, deviceLabel, preview)
 
         // 点击复制 action
         val copyIntent = Intent(this, CopyReceiver::class.java).apply {
@@ -224,9 +236,9 @@ class GhostClipService : LifecycleService() {
 
         val notification = NotificationCompat.Builder(this, CLIP_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(getString(R.string.notif_clip_title))
-            .setContentText(preview)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(preview))
+            .setContentTitle(getString(R.string.notif_clip_received))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setAutoCancel(true)
             .addAction(0, getString(R.string.notif_clip_copy), copyPi)
             .setTimeoutAfter(30_000) // 30s 后自动消失
