@@ -415,16 +415,31 @@ fn generate_device_id() -> String {
     format!("mac-{}", &hash[..12])
 }
 
-/// 发送系统通知
-fn send_notification(app: &tauri::AppHandle, text: &str) {
-    use tauri_plugin_notification::NotificationExt;
-    let preview = truncate_str(text, 100);
-    let _ = app
-        .notification()
-        .builder()
-        .title("来自 Android 的剪贴板已同步")
-        .body(preview)
-        .show();
+/// 发送系统通知（带「复制」按钮，alert 样式停留直到用户操作）
+fn send_notification(_app: &tauri::AppHandle, text: &str) {
+    let text_owned = text.to_string();
+    std::thread::spawn(move || {
+        use mac_notification_sys::{Notification, MainButton, NotificationResponse};
+        let preview = truncate_str(&text_owned, 100);
+        let result = Notification::new()
+            .title("来自 Android 的剪贴板已同步")
+            .message(&preview)
+            .main_button(MainButton::SingleAction("复制"))
+            .send();
+        match result {
+            Ok(response) => {
+                match response {
+                    NotificationResponse::ActionButton(_) | NotificationResponse::Click => {
+                        // 用户点击「复制」或点击通知本体 → 写入剪贴板
+                        clipboard::write_clipboard(&text_owned);
+                        log::info!("通知点击复制: len={}", text_owned.len());
+                    }
+                    _ => {}
+                }
+            }
+            Err(e) => log::error!("发送通知失败: {}", e),
+        }
+    });
 }
 
 /// 发射连接状态变更事件到前端

@@ -225,12 +225,21 @@ class GhostClipService : LifecycleService() {
         val deviceLabel = PairingManager.macDeviceName.ifEmpty { "Mac" }
         val body = getString(R.string.notif_clip_from, deviceLabel, preview)
 
-        // 点击复制 action
-        val copyIntent = Intent(this, CopyReceiver::class.java).apply {
+        // 点击通知体 → 复制 + 关闭
+        val tapIntent = Intent(this, CopyReceiver::class.java).apply {
             putExtra("text", text)
         }
-        val copyPi = PendingIntent.getBroadcast(
-            this, text.hashCode(), copyIntent,
+        val tapPi = PendingIntent.getBroadcast(
+            this, text.hashCode(), tapIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        // Action 按钮「复制」
+        val actionIntent = Intent(this, CopyReceiver::class.java).apply {
+            putExtra("text", text)
+        }
+        val actionPi = PendingIntent.getBroadcast(
+            this, text.hashCode() + 1, actionIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
@@ -239,9 +248,9 @@ class GhostClipService : LifecycleService() {
             .setContentTitle(getString(R.string.notif_clip_received))
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setContentIntent(tapPi)
             .setAutoCancel(true)
-            .addAction(0, getString(R.string.notif_clip_copy), copyPi)
-            .setTimeoutAfter(30_000) // 30s 后自动消失
+            .addAction(0, getString(R.string.notif_clip_copy), actionPi)
             .build()
 
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
