@@ -56,6 +56,15 @@
             </intent-filter>
         </activity>
 
+        <!-- 透明剪贴板写入（后台收到远端内容时启动） -->
+        <activity
+            android:name=".ui.ClipWriteActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GhostClip.Transparent"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:noHistory="true" />
+
         <!-- 电池优化引导 -->
         <activity
             android:name=".ui.BatteryGuideActivity"
