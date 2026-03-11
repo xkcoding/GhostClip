@@ -228,6 +228,17 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
+        findViewById<TextView>(R.id.btn_copy_logs).setOnClickListener {
+            val logs = DebugLog.getAll()
+            if (logs.isNotBlank()) {
+                val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                cm.setPrimaryClip(ClipData.newPlainText("GhostClip Logs", logs))
+                Toast.makeText(this, "日志已复制", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "暂无日志", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         findViewById<TextView>(R.id.btn_clear_logs).setOnClickListener {
             DebugLog.clear()
             logText.text = ""

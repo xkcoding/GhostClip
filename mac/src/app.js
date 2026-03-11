@@ -318,9 +318,15 @@ function renderSettings() {
 
 function renderQrPopup() {
   const deviceLabel = state.macHash ? `${escapeHtml(state.deviceName || 'Mac')} \u00B7 gc-${escapeHtml(state.macHash)}` : '';
+  const isSettingsWindow = window.location.hash === '#settings';
 
-  return `
-    <div id="qr-popup" class="active">
+  // Settings 窗口已有原生标题栏，不需要自定义 traffic lights
+  const titleBarHtml = isSettingsWindow ? `
+      <div class="qr-title-bar">
+        <span class="qr-back-btn" data-action="close-qr">\u2190 \u8FD4\u56DE\u8BBE\u7F6E</span>
+        <div class="win-spacer"></div>
+      </div>
+  ` : `
       <div class="qr-title-bar">
         <div class="traffic-lights">
           <div class="traffic-light red" data-action="close-qr"></div>
@@ -330,6 +336,11 @@ function renderQrPopup() {
         <span class="win-title">\u626B\u7801\u914D\u5BF9</span>
         <div class="win-spacer"></div>
       </div>
+  `;
+
+  return `
+    <div id="qr-popup" class="active">
+      ${titleBarHtml}
       <div class="qr-title-divider"></div>
       <div class="qr-body">
         <div class="qr-code-container">
@@ -502,16 +513,7 @@ function handleStartRecordHotkey() {
 }
 
 async function handlePair() {
-  // 如果在 Settings 窗口中触发，关闭 Settings 窗口，让 main 窗口显示 QR
-  const currentWindow = window.__TAURI__?.window?.getCurrentWindow();
-  if (currentWindow && currentWindow.label === 'settings') {
-    // 通知 main 窗口显示 QR
-    await emit('show-qr-from-settings');
-    await currentWindow.close();
-    return;
-  }
-
-  // Generate QR code SVG and show popup
+  // Generate QR code SVG and show popup (works in both main and settings windows)
   try {
     const svgResult = await invoke('cmd_generate_qr_code');
     if (svgResult) {
@@ -744,29 +746,6 @@ async function setupBackendListeners() {
 
   await listen('show-settings', () => {
     state.currentView = 'settings';
-    render();
-  });
-
-  // Settings 窗口发来的 QR 显示请求（仅 main 窗口响应）
-  await listen('show-qr-from-settings', async () => {
-    if (currentWindowLabel !== 'main') return;
-    try {
-      const svgResult = await invoke('cmd_generate_qr_code');
-      if (svgResult) {
-        state.qrSvg = typeof svgResult === 'string' ? svgResult : '';
-      }
-      await refreshPairingState();
-    } catch (e) {
-      console.warn('[GhostClip] Failed to generate QR code:', e);
-    }
-    state.currentView = 'dropdown';
-    state.qrPopupVisible = true;
-    // 显示 main 窗口
-    const mainWin = window.__TAURI__?.window?.getCurrentWindow();
-    if (mainWin && mainWin.label === 'main') {
-      await mainWin.show();
-      await mainWin.setFocus();
-    }
     render();
   });
 

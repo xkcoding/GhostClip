@@ -237,6 +237,15 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/btn_copy_logs"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="复制"
+                        android:textColor="@color/accent"
+                        android:textSize="13sp"
+                        android:padding="8dp" />
+
+                    <TextView
                         android:id="@+id/btn_clear_logs"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
