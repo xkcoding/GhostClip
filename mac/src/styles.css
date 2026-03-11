@@ -673,6 +673,7 @@ html, body {
 
 #qr-popup.settings-embedded {
   border-radius: 0;
+  border: none;
 }
 
 #qr-popup.active {

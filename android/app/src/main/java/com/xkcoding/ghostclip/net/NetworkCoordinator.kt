@@ -11,6 +11,7 @@ import com.xkcoding.ghostclip.clip.ClipboardHelper
 import com.xkcoding.ghostclip.clip.HashPool
 import com.xkcoding.ghostclip.clip.SyncBridge
 import com.xkcoding.ghostclip.service.GhostClipService
+import com.xkcoding.ghostclip.ui.ClipWriteActivity
 import com.xkcoding.ghostclip.ui.MainActivity
 import com.xkcoding.ghostclip.util.DebugLog
 import kotlinx.coroutines.CoroutineScope
@@ -269,8 +270,8 @@ class NetworkCoordinator(
                     lastReceivedClip = content
                     lastSentClip = null
                     pendingClip = content
-                    // 尝试直接写入（前台宽限期内可成功，后台可能静默失败）
-                    ClipboardHelper.write(context, content)
+                    // 通过透明 Activity 写入剪贴板（Service 后台直接写在 HyperOS 等系统上静默失败）
+                    ClipWriteActivity.launch(context, content)
                     broadcastClipSynced(content, "incoming", connectedMacName.ifEmpty { "Mac" })
                     // 弹出临时通知 (7.8)
                     broadcastClipNotification(content)
@@ -495,7 +496,7 @@ class NetworkCoordinator(
                         lastReceivedClip = record.text
                         lastSentClip = null
                         pendingClip = record.text
-                        ClipboardHelper.write(context, record.text)
+                        ClipWriteActivity.launch(context, record.text)
                         broadcastClipSynced(record.text, "incoming", "Mac (Cloud)")
                     }
                 }
