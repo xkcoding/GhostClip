@@ -289,6 +289,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun readClipboard(source: String) {
+        // 未连接时不读取剪贴板，避免无意义的操作
+        if (PairingManager.state != PairingManager.State.CONNECTED) {
+            DebugLog.d(TAG, "[$source] 跳过(未连接)")
+            return
+        }
+
         val text = ClipboardHelper.read(this)
         if (text.isNullOrBlank()) {
             DebugLog.d(TAG, "[$source] 剪贴板为空")
