@@ -266,8 +266,8 @@ class NetworkCoordinator(
                     lastReceivedClip = content
                     lastSentClip = null
                     pendingClip = content
-                    // 通过透明 Activity 写入剪贴板（绕过 HyperOS 后台写入限制）
-                    com.xkcoding.ghostclip.ui.ClipWriteActivity.launch(context, content)
+                    // 尝试直接写入（前台宽限期内可成功，后台可能静默失败）
+                    ClipboardHelper.write(context, content)
                     broadcastClipSynced(content, "incoming", connectedMacName.ifEmpty { "Mac" })
                     // 弹出临时通知 (7.8)
                     broadcastClipNotification(content)
@@ -492,7 +492,7 @@ class NetworkCoordinator(
                         lastReceivedClip = record.text
                         lastSentClip = null
                         pendingClip = record.text
-                        com.xkcoding.ghostclip.ui.ClipWriteActivity.launch(context, record.text)
+                        ClipboardHelper.write(context, record.text)
                         broadcastClipSynced(record.text, "incoming", "Mac (Cloud)")
                     }
                 }
