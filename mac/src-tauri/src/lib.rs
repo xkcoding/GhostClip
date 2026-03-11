@@ -695,8 +695,9 @@ fn cmd_open_settings(app: tauri::AppHandle) {
 
 /// 打开或聚焦设置窗口
 fn show_settings_window(app: &tauri::AppHandle) {
-    // 如果窗口已存在，直接聚焦
+    // 如果窗口已存在，确保显示设置视图并聚焦
     if let Some(win) = app.get_webview_window("settings") {
+        let _ = app.emit_to("settings", "show-settings", ());
         let _ = win.show();
         let _ = win.set_focus();
         return;

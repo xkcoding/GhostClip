@@ -720,8 +720,12 @@ async function setupBackendListeners() {
     }
   });
 
-  // Listen for view switch commands from tray menu
+  // 获取当前窗口标签，用于过滤事件
+  const currentWindowLabel = window.__TAURI__?.window?.getCurrentWindow()?.label || 'main';
+
+  // Listen for view switch commands from tray menu（仅 main 窗口响应）
   await listen('show-dropdown', async () => {
+    if (currentWindowLabel !== 'main') return;
     state.currentView = 'dropdown';
     state.qrPopupVisible = false;
     // 主动查询当前连接状态和配对状态（补偿 popup 隐藏期间错过的事件）
@@ -743,8 +747,9 @@ async function setupBackendListeners() {
     render();
   });
 
-  // Settings 窗口发来的 QR 显示请求
+  // Settings 窗口发来的 QR 显示请求（仅 main 窗口响应）
   await listen('show-qr-from-settings', async () => {
+    if (currentWindowLabel !== 'main') return;
     try {
       const svgResult = await invoke('cmd_generate_qr_code');
       if (svgResult) {
