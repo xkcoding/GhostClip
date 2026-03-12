@@ -1,0 +1,93 @@
+---
+import LucideIcon from './LucideIcon.astro';
+
+const navLinks = [
+  { href: '#pain-points', label: '痛点' },
+  { href: '#sync', label: '使用方式' },
+  { href: '#quickstart', label: '上手' },
+  { href: '#download', label: '下载' },
+];
+---
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <img src="/logo.svg" alt="GhostClip" width="28" height="28" />
+      <span>GhostClip</span>
+    </a>
+    <div class="nav-links">
+      {navLinks.map((link) => (
+        <a href={link.href}>{link.label}</a>
+      ))}
+      <a
+        href="https://github.com/xkcoding/GhostClip"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="nav-github"
+      >
+        <LucideIcon name="github" size={16} color="#0D0D0D" />
+        <span>GitHub</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #E8E8E8;
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+  .nav-logo img {
+    border-radius: 5px;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    font-size: 14px;
+    color: #7A7A7A;
+  }
+  .nav-links a:hover {
+    color: var(--text);
+  }
+  .nav-github {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #FAFAFA;
+    border: 1px solid #E8E8E8;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #0D0D0D;
+  }
+  .nav-github:hover {
+    background: #F0F0F0;
+  }
+
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none;
+    }
+  }
+</style>

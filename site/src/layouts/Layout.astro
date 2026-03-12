@@ -1,0 +1,69 @@
+---
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+
+    <!-- Scroll fade-in animation -->
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+      document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+
+      // Copy to clipboard for all [data-copy] buttons
+      document.querySelectorAll<HTMLElement>('[data-copy]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const text = btn.dataset.copy;
+          if (!text) return;
+          await navigator.clipboard.writeText(text);
+          btn.classList.add('copied');
+          const textEl = btn.querySelector('.dl-copy-text');
+          if (textEl) textEl.textContent = '已复制';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            if (textEl) textEl.textContent = '复制';
+          }, 2000);
+        });
+      });
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "8c9e4b13d3b940ab88db118e6675d4c5"}'></script>
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+</style>

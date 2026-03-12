@@ -1,0 +1,122 @@
+---
+import LucideIcon from './LucideIcon.astro';
+
+const steps = [
+  { num: '1', text: 'Mac 安装 GhostClip' },
+  { num: '2', text: 'Android 安装 APK' },
+  { num: '3', text: '同一 WiFi 扫码配对' },
+  { num: '4', text: '开始同步！' },
+];
+
+const permissions = [
+  { icon: 'camera', name: '相机', value: '使用时允许', note: '仅扫码配对时使用' },
+  { icon: 'clipboard', name: '剪贴板', value: '始终允许', note: '接收同步内容需要写入剪贴板' },
+  { icon: 'bell', name: '通知', value: '开启', note: '查看 Mac 下发的内容' },
+];
+---
+
+<section id="quickstart" class="section section-alt">
+  <div class="container">
+    <h2 class="section-title fade-in">30 秒上手</h2>
+    <div class="steps fade-in">
+      {steps.map((step) => (
+        <div class="step">
+          <div class="step-num">{step.num}</div>
+          <p>{step.text}</p>
+        </div>
+      ))}
+    </div>
+    <div class="permissions fade-in">
+      <h3 class="perm-title">建议开启的权限</h3>
+      <div class="perm-table">
+        {permissions.map((perm) => (
+          <div class="perm-row">
+            <LucideIcon name={perm.icon} size={20} color="#22C55E" />
+            <span class="perm-name">{perm.name}</span>
+            <span class="perm-value">{perm.value}</span>
+            <span class="perm-note">{perm.note}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .step {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .step-num {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 600;
+    color: #22C55E;
+  }
+  .step p {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .permissions {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .perm-title {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .perm-table {
+    background: #FFFFFF;
+    border: 1px solid #E8E8E8;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .perm-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    border-bottom: 1px solid #E8E8E8;
+  }
+  .perm-row:last-child {
+    border-bottom: none;
+  }
+  .perm-name {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 600;
+    width: 60px;
+  }
+  .perm-value {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .perm-note {
+    font-size: 13px;
+    color: #7A7A7A;
+  }
+
+  @media (max-width: 768px) {
+    .steps {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .perm-row {
+      flex-wrap: wrap;
+    }
+  }
+</style>

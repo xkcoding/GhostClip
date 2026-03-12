@@ -1,0 +1,71 @@
+---
+import LucideIcon from './LucideIcon.astro';
+
+const points = [
+  {
+    icon: 'shield',
+    title: '隐私',
+    text: '密码、聊天记录不会被无差别搬运，只有你主动触发的内容才会同步',
+  },
+  {
+    icon: 'battery-full',
+    title: '省电',
+    text: '不在后台持续监听剪贴板，不会偷偷耗电耗流量',
+  },
+  {
+    icon: 'target',
+    title: '精准',
+    text: '你决定什么时候同步、同步什么内容，一次点击就是你的同步指令',
+  },
+];
+---
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title fade-in">只同步你想同步的</h2>
+    <p class="section-subtitle fade-in">不是做不到全自动，而是故意这样设计</p>
+    <div class="phil-cards fade-in">
+      {points.map((item) => (
+        <div class="phil-card">
+          <LucideIcon name={item.icon} size={32} color="#22C55E" />
+          <h4>{item.title}</h4>
+          <p>{item.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .phil-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .phil-card {
+    background: #FAFAFA;
+    border-radius: 12px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  .phil-card h4 {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .phil-card p {
+    font-size: 13px;
+    color: #7A7A7A;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .phil-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

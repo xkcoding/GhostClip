@@ -1,0 +1,71 @@
+---
+import LucideIcon from './LucideIcon.astro';
+
+const painPoints = [
+  {
+    icon: 'message-square',
+    title: '验证码手动敲',
+    text: '手机收到验证码，复制后抬头看 Mac，只能一个数字一个数字敲进去。以前 iPhone 自动就到了。',
+  },
+  {
+    icon: 'map-pin',
+    title: '地址靠微信传',
+    text: 'Mac 上复制一个地址，想发到手机导航。打开微信，找到「文件传输助手」，粘贴，发送，再切到手机。',
+  },
+  {
+    icon: 'file-text',
+    title: '文案自己发给自己',
+    text: '手机上看到一段好文案，想在电脑上继续编辑。只能打开聊天工具，发给自己，再到电脑上复制。',
+  },
+];
+---
+
+<section id="pain-points" class="section section-alt">
+  <div class="container">
+    <h2 class="section-title fade-in">从 iPhone 换到 Android 后<br />有些事突然变麻烦了</h2>
+    <div class="pain-cards fade-in">
+      {painPoints.map((item) => (
+        <div class="pain-card">
+          <div class="pain-icon">
+            <LucideIcon name={item.icon} size={28} color="#22C55E" />
+          </div>
+          <h4>{item.title}</h4>
+          <p>{item.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .pain-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .pain-card {
+    background: #FFFFFF;
+    border: 1px solid #E8E8E8;
+    border-radius: 12px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .pain-card h4 {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .pain-card p {
+    font-size: 14px;
+    color: #7A7A7A;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .pain-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

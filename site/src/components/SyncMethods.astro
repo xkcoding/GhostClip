@@ -1,0 +1,132 @@
+---
+import LucideIcon from './LucideIcon.astro';
+---
+
+<section id="sync" class="section section-alt">
+  <div class="container">
+    <h2 class="section-title fade-in">两种方向，各有姿势</h2>
+    <div class="sync-grid fade-in">
+      <!-- Android → Mac -->
+      <div class="sync-col">
+        <div class="sync-header">
+          <LucideIcon name="smartphone" size={24} color="#22C55E" />
+          <LucideIcon name="arrow-right" size={20} color="#B0B0B0" />
+          <LucideIcon name="monitor" size={24} color="#0D0D0D" />
+          <span class="sync-heading">Android → Mac</span>
+        </div>
+        <p class="sync-subtitle">在任意 App 复制文字后</p>
+        <div class="sync-way sync-way-highlight">
+          <div class="sync-way-header">
+            <span class="sync-badge">推荐</span>
+            <h4>点击系统悬浮球</h4>
+          </div>
+          <p>在系统设置中将悬浮球快捷方式配置为打开 GhostClip，任意界面轻点即可同步剪贴板到 Mac。</p>
+        </div>
+        <div class="sync-way">
+          <h4>切回 GhostClip 前台</h4>
+          <p>打开 App 或从后台切回，自动读取最新剪贴板并同步。</p>
+        </div>
+        <p class="sync-result">Mac 自动接收 → 直接 Cmd+V 粘贴</p>
+      </div>
+
+      <!-- Mac → Android -->
+      <div class="sync-col">
+        <div class="sync-header">
+          <LucideIcon name="monitor" size={24} color="#22C55E" />
+          <LucideIcon name="arrow-right" size={20} color="#B0B0B0" />
+          <LucideIcon name="smartphone" size={24} color="#0D0D0D" />
+          <span class="sync-heading">Mac → Android</span>
+        </div>
+        <p class="sync-subtitle">Mac 复制文字后，两种方式发送</p>
+        <div class="sync-way">
+          <h4>快捷键 Cmd+Shift+C</h4>
+          <p>键盘党最爱，一键发送当前剪贴板到手机。</p>
+        </div>
+        <div class="sync-way">
+          <h4>Menu Bar → 发送剪贴板到 Android</h4>
+          <p>点击菜单栏图标，从下拉菜单中选择发送。鼠标操作，简单直观。</p>
+        </div>
+        <p class="sync-result">手机收到通知 → 点击即可粘贴使用</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sync-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .sync-col {
+    background: var(--bg);
+    border: 1px solid #E8E8E8;
+    border-radius: 12px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .sync-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sync-heading {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .sync-subtitle {
+    font-size: 14px;
+    color: #7A7A7A;
+    margin-top: -12px;
+  }
+  .sync-way {
+    background: #FAFAFA;
+    padding: 16px 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sync-way-highlight {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+  }
+  .sync-way-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sync-way h4 {
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .sync-way p {
+    font-size: 13px;
+    color: #7A7A7A;
+    line-height: 1.6;
+  }
+  .sync-badge {
+    display: inline-block;
+    background: var(--brand);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .sync-result {
+    font-size: 14px;
+    font-weight: 500;
+    color: #22C55E;
+  }
+
+  @media (max-width: 768px) {
+    .sync-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

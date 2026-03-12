@@ -1,0 +1,2267 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "mFdSu",
+      "x": 1520,
+      "y": 203,
+      "name": "App Icon — Ghost with Envelope",
+      "width": 400,
+      "height": 400,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#4ADE80",
+            "position": 0
+          },
+          {
+            "color": "#16A34A",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 72,
+      "layout": "none",
+      "children": [
+        {
+          "type": "path",
+          "id": "m6n6R",
+          "x": 80,
+          "y": 60,
+          "name": "Ghost Body",
+          "geometry": "M120 0c66 0 120 54 120 120l0 100c0 25-15 40-40 40-25 0-25-30-40-30-15 0-15 30-40 30-25 0-25-30-40-30-15 0-15 30-40 30-25 0-40-15-40-40l0-100c0-66 54-120 120-120z",
+          "fill": "#FFFFFF",
+          "width": 240,
+          "height": 270,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#00000020",
+            "offset": {
+              "x": 0,
+              "y": 6
+            },
+            "blur": 20
+          }
+        },
+        {
+          "type": "path",
+          "id": "kNWZF",
+          "x": 135,
+          "y": 205,
+          "name": "Envelope Flap",
+          "geometry": "M0 30l65-30 65 30z",
+          "fill": "#16A34A",
+          "width": 130,
+          "height": 30
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": [
+            0,
+            0,
+            8,
+            8
+          ],
+          "id": "0jFoU",
+          "x": 135,
+          "y": 235,
+          "name": "Envelope Body",
+          "fill": "#22C55E",
+          "width": 130,
+          "height": 55
+        },
+        {
+          "type": "path",
+          "id": "InR2G",
+          "x": 140,
+          "y": 238,
+          "name": "Envelope Fold",
+          "geometry": "M0 0l60 26 60-26",
+          "width": 120,
+          "height": 26,
+          "stroke": {
+            "thickness": 2.5,
+            "join": "round",
+            "cap": "round",
+            "fill": "#15803D"
+          }
+        },
+        {
+          "type": "ellipse",
+          "id": "BJKSP",
+          "x": 152,
+          "y": 135,
+          "name": "Left Eye",
+          "fill": "#1E293B",
+          "width": 24,
+          "height": 30
+        },
+        {
+          "type": "ellipse",
+          "id": "n1Ykp",
+          "x": 224,
+          "y": 135,
+          "name": "Right Eye",
+          "fill": "#1E293B",
+          "width": 24,
+          "height": 30
+        },
+        {
+          "type": "ellipse",
+          "id": "81XpQ",
+          "x": 159,
+          "y": 138,
+          "name": "Left Highlight",
+          "fill": "#FFFFFF",
+          "width": 9,
+          "height": 9
+        },
+        {
+          "type": "ellipse",
+          "id": "Af3jt",
+          "x": 231,
+          "y": 138,
+          "name": "Right Highlight",
+          "fill": "#FFFFFF",
+          "width": 9,
+          "height": 9
+        },
+        {
+          "type": "ellipse",
+          "id": "Q2Iy5",
+          "x": 133,
+          "y": 177,
+          "name": "Left Cheek",
+          "opacity": 0.35,
+          "fill": "#FCA5A5",
+          "width": 28,
+          "height": 14
+        },
+        {
+          "type": "ellipse",
+          "id": "bY7ka",
+          "x": 239,
+          "y": 177,
+          "name": "Right Cheek",
+          "opacity": 0.35,
+          "fill": "#FCA5A5",
+          "width": 28,
+          "height": 14
+        },
+        {
+          "type": "path",
+          "id": "7rHc2",
+          "x": 190,
+          "y": 187,
+          "name": "Mouth",
+          "geometry": "M0 0q10 6 20 0",
+          "width": 20,
+          "height": 6,
+          "stroke": {
+            "thickness": 2,
+            "cap": "round",
+            "fill": "#64748B"
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "mgvHo",
+      "x": 0,
+      "y": 0,
+      "name": "Landing Page",
+      "width": 1440,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "zp2BL",
+          "name": "Top Nav",
+          "width": "fill_container",
+          "height": 56,
+          "fill": "#FFFFFF",
+          "stroke": {
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#E8E8E8"
+          },
+          "padding": [
+            0,
+            48
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "7IIT7",
+              "name": "navLeft",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "cBlyZ",
+                  "name": "navLogoBox",
+                  "width": 28,
+                  "height": 28,
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": 180,
+                    "size": {
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "#4ADE80",
+                        "position": 0
+                      },
+                      {
+                        "color": "#16A34A",
+                        "position": 1
+                      }
+                    ]
+                  },
+                  "cornerRadius": 5,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "path",
+                      "id": "Yz9j6",
+                      "x": 5.6,
+                      "y": 4.2,
+                      "name": "Ghost Body",
+                      "geometry": "M8.4 0c4.62 0 8.4 3.78 8.4 8.4l0 7c0 1.75-1.05 2.8-2.8 2.8-1.75 0-1.75-2.1-2.8-2.1-1.05 0-1.05 2.1-2.8 2.1-1.75 0-1.75-2.1-2.8-2.1-1.05 0-1.05 2.1-2.8 2.1-1.75 0-2.8-1.05-2.8-2.8l0-7c0-4.62 3.78-8.4 8.4-8.4z",
+                      "fill": "#FFFFFF",
+                      "width": 16.8,
+                      "height": 18.9,
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#00000020",
+                        "offset": {
+                          "x": 0,
+                          "y": 1
+                        },
+                        "blur": 4
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "id": "PBcIt",
+                      "x": 9.45,
+                      "y": 14.35,
+                      "name": "Envelope Flap",
+                      "geometry": "M0 2.1l4.55-2.1 4.55 2.1z",
+                      "fill": "#16A34A",
+                      "width": 9.1,
+                      "height": 2.1
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": [
+                        0,
+                        0,
+                        0.56,
+                        0.56
+                      ],
+                      "id": "QSOCt",
+                      "x": 9.45,
+                      "y": 16.45,
+                      "name": "Envelope Body",
+                      "fill": "#22C55E",
+                      "width": 9.1,
+                      "height": 3.85
+                    },
+                    {
+                      "type": "path",
+                      "id": "8aGxn",
+                      "x": 9.8,
+                      "y": 16.66,
+                      "name": "Envelope Fold",
+                      "geometry": "M0 0l4.2 1.82 4.2-1.82",
+                      "width": 8.4,
+                      "height": 1.82,
+                      "stroke": {
+                        "thickness": 0.18,
+                        "join": "round",
+                        "cap": "round",
+                        "fill": "#15803D"
+                      }
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "g3i0z",
+                      "x": 10.64,
+                      "y": 9.45,
+                      "name": "Left Eye",
+                      "fill": "#1E293B",
+                      "width": 1.68,
+                      "height": 2.1
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "LCGpn",
+                      "x": 15.68,
+                      "y": 9.45,
+                      "name": "Right Eye",
+                      "fill": "#1E293B",
+                      "width": 1.68,
+                      "height": 2.1
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "8AhRd",
+                      "x": 11.13,
+                      "y": 9.66,
+                      "name": "Left Highlight",
+                      "fill": "#FFFFFF",
+                      "width": 0.63,
+                      "height": 0.63
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "5Qqjn",
+                      "x": 16.17,
+                      "y": 9.66,
+                      "name": "Right Highlight",
+                      "fill": "#FFFFFF",
+                      "width": 0.63,
+                      "height": 0.63
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "w5j2m",
+                      "x": 9.31,
+                      "y": 12.39,
+                      "name": "Left Cheek",
+                      "opacity": 0.35,
+                      "fill": "#FCA5A5",
+                      "width": 1.96,
+                      "height": 0.98
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "kWacf",
+                      "x": 16.73,
+                      "y": 12.39,
+                      "name": "Right Cheek",
+                      "opacity": 0.35,
+                      "fill": "#FCA5A5",
+                      "width": 1.96,
+                      "height": 0.98
+                    },
+                    {
+                      "type": "path",
+                      "id": "dVU7b",
+                      "x": 13.3,
+                      "y": 13.09,
+                      "name": "Mouth",
+                      "geometry": "M0 0q0.7 0.42 1.4 0",
+                      "width": 1.4,
+                      "height": 0.42,
+                      "stroke": {
+                        "thickness": 0.14,
+                        "cap": "round",
+                        "fill": "#64748B"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "Z3K7O",
+                  "name": "navTitle",
+                  "fill": "#0D0D0D",
+                  "content": "GhostClip",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 16,
+                  "fontWeight": "600",
+                  "letterSpacing": -0.3
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "QRQB7",
+              "name": "Nav Links",
+              "gap": 32,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "01DTG",
+                  "name": "linkPain",
+                  "fill": "#7A7A7A",
+                  "content": "痛点",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                },
+                {
+                  "type": "text",
+                  "id": "qQ9ev",
+                  "name": "linkSync",
+                  "fill": "#7A7A7A",
+                  "content": "使用方式",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                },
+                {
+                  "type": "text",
+                  "id": "HF8Jq",
+                  "name": "linkStart",
+                  "fill": "#7A7A7A",
+                  "content": "上手",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                },
+                {
+                  "type": "text",
+                  "id": "Kmg8I",
+                  "name": "linkDl",
+                  "fill": "#7A7A7A",
+                  "content": "下载",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "N2a3t",
+              "name": "navGithub",
+              "fill": "#FAFAFA",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E8E8E8"
+              },
+              "gap": 6,
+              "padding": [
+                6,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "u8N2k",
+                  "name": "navGhIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "github",
+                  "iconFontFamily": "lucide",
+                  "fill": "#0D0D0D"
+                },
+                {
+                  "type": "text",
+                  "id": "7Ec8H",
+                  "name": "navGhText",
+                  "fill": "#0D0D0D",
+                  "content": "GitHub",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "sjJpi",
+          "name": "Hero Section",
+          "width": "fill_container",
+          "fill": "#FFFFFF",
+          "layout": "vertical",
+          "gap": 32,
+          "padding": [
+            120,
+            0,
+            100,
+            0
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "szXmZ",
+              "name": "Logo",
+              "width": 80,
+              "height": 80,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 180,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#4ADE80",
+                    "position": 0
+                  },
+                  {
+                    "color": "#16A34A",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 14,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "path",
+                  "id": "cuVuP",
+                  "x": 16,
+                  "y": 12,
+                  "name": "Ghost Body",
+                  "geometry": "M24 0c13.2 0 24 10.8 24 24l0 20c0 5-3 8-8 8-5 0-5-6-8-6-3 0-3 6-8 6-5 0-5-6-8-6-3 0-3 6-8 6-5 0-8-3-8-8l0-20c0-13.2 10.8-24 24-24z",
+                  "fill": "#FFFFFF",
+                  "width": 48,
+                  "height": 54,
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000020",
+                    "offset": {
+                      "x": 0,
+                      "y": 2
+                    },
+                    "blur": 6
+                  }
+                },
+                {
+                  "type": "path",
+                  "id": "RGGCu",
+                  "x": 27,
+                  "y": 41,
+                  "name": "Envelope Flap",
+                  "geometry": "M0 6l13-6 13 6z",
+                  "fill": "#16A34A",
+                  "width": 26,
+                  "height": 6
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    0,
+                    0,
+                    2,
+                    2
+                  ],
+                  "id": "6kaDk",
+                  "x": 27,
+                  "y": 47,
+                  "name": "Envelope Body",
+                  "fill": "#22C55E",
+                  "width": 26,
+                  "height": 11
+                },
+                {
+                  "type": "path",
+                  "id": "gLYy7",
+                  "x": 28,
+                  "y": 47.6,
+                  "name": "Envelope Fold",
+                  "geometry": "M0 0l12 5.2 12-5.2",
+                  "width": 24,
+                  "height": 5.2,
+                  "stroke": {
+                    "thickness": 0.5,
+                    "join": "round",
+                    "cap": "round",
+                    "fill": "#15803D"
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "2PngG",
+                  "x": 30.4,
+                  "y": 27,
+                  "name": "Left Eye",
+                  "fill": "#1E293B",
+                  "width": 4.8,
+                  "height": 6
+                },
+                {
+                  "type": "ellipse",
+                  "id": "rBn0V",
+                  "x": 44.8,
+                  "y": 27,
+                  "name": "Right Eye",
+                  "fill": "#1E293B",
+                  "width": 4.8,
+                  "height": 6
+                },
+                {
+                  "type": "ellipse",
+                  "id": "melE2",
+                  "x": 31.8,
+                  "y": 27.6,
+                  "name": "Left Highlight",
+                  "fill": "#FFFFFF",
+                  "width": 1.8,
+                  "height": 1.8
+                },
+                {
+                  "type": "ellipse",
+                  "id": "qcyVT",
+                  "x": 46.2,
+                  "y": 27.6,
+                  "name": "Right Highlight",
+                  "fill": "#FFFFFF",
+                  "width": 1.8,
+                  "height": 1.8
+                },
+                {
+                  "type": "ellipse",
+                  "id": "WOHFJ",
+                  "x": 26.6,
+                  "y": 35.4,
+                  "name": "Left Cheek",
+                  "opacity": 0.35,
+                  "fill": "#FCA5A5",
+                  "width": 5.6,
+                  "height": 2.8
+                },
+                {
+                  "type": "ellipse",
+                  "id": "kiyCl",
+                  "x": 47.8,
+                  "y": 35.4,
+                  "name": "Right Cheek",
+                  "opacity": 0.35,
+                  "fill": "#FCA5A5",
+                  "width": 5.6,
+                  "height": 2.8
+                },
+                {
+                  "type": "path",
+                  "id": "68dPb",
+                  "x": 38,
+                  "y": 37.4,
+                  "name": "Mouth",
+                  "geometry": "M0 0q2 1.2 4 0",
+                  "width": 4,
+                  "height": 1.2,
+                  "stroke": {
+                    "thickness": 0.4,
+                    "cap": "round",
+                    "fill": "#64748B"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "MwfRP",
+              "name": "Slogan",
+              "fill": "#0D0D0D",
+              "content": "选了 Android，不必放弃 Mac 体验",
+              "textAlign": "center",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 48,
+              "fontWeight": "600",
+              "letterSpacing": -1
+            },
+            {
+              "type": "text",
+              "id": "hDCGy",
+              "name": "Subtitle",
+              "fill": "#7A7A7A",
+              "content": "Android 与 Mac 之间的文本剪贴板同步，局域网直连，数据不经云端",
+              "lineHeight": 1.6,
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "jXv0r",
+              "name": "CTA Buttons",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "7OWOg",
+                  "name": "Mac CTA",
+                  "fill": "#0D0D0D",
+                  "gap": 8,
+                  "padding": [
+                    14,
+                    28
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "cz4kW",
+                      "name": "macIcon",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "monitor",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFF"
+                    },
+                    {
+                      "type": "text",
+                      "id": "WRIht",
+                      "name": "macLabel",
+                      "fill": "#FFFFFF",
+                      "content": "下载 Mac 版",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "lmt9N",
+                  "name": "Android CTA",
+                  "fill": "#FFFFFF",
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E8E8E8"
+                  },
+                  "gap": 8,
+                  "padding": [
+                    14,
+                    28
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "m8t9Z",
+                      "name": "androidIcon",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "smartphone",
+                      "iconFontFamily": "lucide",
+                      "fill": "#0D0D0D"
+                    },
+                    {
+                      "type": "text",
+                      "id": "9EpsH",
+                      "name": "androidLabel",
+                      "fill": "#0D0D0D",
+                      "content": "下载 Android 版",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "GqCTb",
+          "name": "Pain Points Section",
+          "width": "fill_container",
+          "fill": "#FAFAFA",
+          "layout": "vertical",
+          "gap": 48,
+          "padding": [
+            80,
+            360
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "ugCEx",
+              "name": "Pain Title",
+              "fill": "#0D0D0D",
+              "textGrowth": "fixed-width",
+              "width": 600,
+              "content": "从 iPhone 换到 Android 后\n有些事突然变麻烦了",
+              "lineHeight": 1.4,
+              "textAlign": "center",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 32,
+              "fontWeight": "600",
+              "letterSpacing": -0.5
+            },
+            {
+              "type": "frame",
+              "id": "GIV3K",
+              "name": "Pain Cards",
+              "width": "fill_container",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "VJJBZ",
+                  "name": "Pain Card 1",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E8E8E8"
+                  },
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 28,
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "2NRBC",
+                      "name": "card1Icon",
+                      "width": 28,
+                      "height": 28,
+                      "iconFontName": "message-square",
+                      "iconFontFamily": "lucide",
+                      "fill": "#22C55E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "PUwTW",
+                      "name": "card1Title",
+                      "fill": "#0D0D0D",
+                      "content": "验证码手动敲",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "NHeLb",
+                      "name": "card1Desc",
+                      "fill": "#7A7A7A",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "手机收到验证码，复制后抬头看 Mac，只能一个数字一个数字敲进去。以前 iPhone 自动就到了。",
+                      "lineHeight": 1.6,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "aKkM6",
+                  "name": "Pain Card 2",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E8E8E8"
+                  },
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 28,
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "dh9yV",
+                      "name": "card2Icon",
+                      "width": 28,
+                      "height": 28,
+                      "iconFontName": "map-pin",
+                      "iconFontFamily": "lucide",
+                      "fill": "#22C55E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ujzba",
+                      "name": "card2Title",
+                      "fill": "#0D0D0D",
+                      "content": "地址靠微信传",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "IuANy",
+                      "name": "card2Desc",
+                      "fill": "#7A7A7A",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Mac 上复制一个地址，想发到手机导航。打开微信，找到「文件传输助手」，粘贴，发送，再切到手机。",
+                      "lineHeight": 1.6,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "WewUr",
+                  "name": "Pain Card 3",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E8E8E8"
+                  },
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 28,
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "rNAsU",
+                      "name": "card3Icon",
+                      "width": 28,
+                      "height": 28,
+                      "iconFontName": "file-text",
+                      "iconFontFamily": "lucide",
+                      "fill": "#22C55E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "FVSum",
+                      "name": "card3Title",
+                      "fill": "#0D0D0D",
+                      "content": "文案自己发给自己",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ebHbx",
+                      "name": "card3Desc",
+                      "fill": "#7A7A7A",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "手机上看到一段好文案，想在电脑上继续编辑。只能打开聊天工具，发给自己，再到电脑上复制。",
+                      "lineHeight": 1.6,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "GKQkd",
+          "name": "Solution Transition",
+          "width": "fill_container",
+          "fill": "#FFFFFF",
+          "layout": "vertical",
+          "gap": 20,
+          "padding": [
+            80,
+            360
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "R1K0B",
+              "name": "Solution Title",
+              "fill": "#22C55E",
+              "content": "GhostClip",
+              "textAlign": "center",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 36,
+              "fontWeight": "600",
+              "letterSpacing": -0.5
+            },
+            {
+              "type": "text",
+              "id": "8U3T6",
+              "name": "Solution Subtitle",
+              "fill": "#0D0D0D",
+              "content": "给 Android + Mac 补上这块拼图",
+              "textAlign": "center",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 24,
+              "fontWeight": "500"
+            },
+            {
+              "type": "text",
+              "id": "svt86",
+              "name": "Solution Desc",
+              "fill": "#7A7A7A",
+              "textGrowth": "fixed-width",
+              "width": 500,
+              "content": "局域网扫码配对，文本复制即同步\n不装额外驱动，不需要登录账号",
+              "lineHeight": 1.7,
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "rkKwy",
+          "name": "Sync Methods Section",
+          "width": "fill_container",
+          "fill": "#FAFAFA",
+          "layout": "vertical",
+          "gap": 48,
+          "padding": [
+            80,
+            360
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "G6UsU",
+              "name": "Sync Title",
+              "fill": "#0D0D0D",
+              "content": "两种方向，各有姿势",
+              "textAlign": "center",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 32,
+              "fontWeight": "600",
+              "letterSpacing": -0.5
+            },
+            {
+              "type": "frame",
+              "id": "0WxTx",
+              "name": "Sync Columns",
+              "width": "fill_container",
+              "gap": 32,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "UHc8J",
+                  "name": "Android to Mac",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E8E8E8"
+                  },
+                  "layout": "vertical",
+                  "gap": 24,
+                  "padding": 32,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "4a7qQ",
+                      "name": "Left Header",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "6Rkrx",
+                          "name": "leftPhoneIcon",
+                          "width": 24,
+                          "height": 24,
+                          "iconFontName": "smartphone",
+                          "iconFontFamily": "lucide",
+                          "fill": "#22C55E"
+                        },
+                        {
+                          "type": "icon_font",
+                          "id": "B84hY",
+                          "name": "leftArrow",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "arrow-right",
+                          "iconFontFamily": "lucide",
+                          "fill": "#B0B0B0"
+                        },
+                        {
+                          "type": "icon_font",
+                          "id": "TdunB",
+                          "name": "leftMacIcon",
+                          "width": 24,
+                          "height": 24,
+                          "iconFontName": "monitor",
+                          "iconFontFamily": "lucide",
+                          "fill": "#0D0D0D"
+                        },
+                        {
+                          "type": "text",
+                          "id": "aSU1P",
+                          "name": "leftTitle",
+                          "fill": "#0D0D0D",
+                          "content": "Android → Mac",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 18,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "qLIim",
+                      "name": "leftDesc",
+                      "fill": "#7A7A7A",
+                      "content": "在任意 App 复制文字后",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "j1xnw",
+                      "name": "Way 1 - Float Ball",
+                      "width": "fill_container",
+                      "fill": "#F0FDF4",
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#BBF7D0"
+                      },
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": [
+                        16,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "QQcrE",
+                          "name": "way1Header",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "PwSM1",
+                              "name": "way1Badge",
+                              "fill": "#22C55E",
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "6va7N",
+                                  "name": "way1BadgeText",
+                                  "fill": "#FFFFFF",
+                                  "content": "推荐",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 11,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "LdYhp",
+                              "name": "way1Title",
+                              "fill": "#0D0D0D",
+                              "content": "点击悬浮球",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 15,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "OCz19",
+                          "name": "way1Desc",
+                          "fill": "#7A7A7A",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "任意界面点一下悬浮球，剪贴板内容秒到 Mac。体验最流畅。",
+                          "lineHeight": 1.6,
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "UDUfc",
+                      "name": "Way 2 - Foreground",
+                      "width": "fill_container",
+                      "fill": "#FAFAFA",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": [
+                        16,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "rLWR6",
+                          "name": "way2Title",
+                          "fill": "#0D0D0D",
+                          "content": "切回 GhostClip 前台",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "4y1m9",
+                          "name": "way2Desc",
+                          "fill": "#7A7A7A",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "打开 App 或从后台切回，自动读取最新剪贴板并同步。",
+                          "lineHeight": 1.6,
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "Ud874",
+                      "name": "leftResult",
+                      "fill": "#22C55E",
+                      "content": "Mac 自动接收 → 直接 Cmd+V 粘贴",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "RSBAj",
+                  "name": "Mac to Android",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E8E8E8"
+                  },
+                  "layout": "vertical",
+                  "gap": 24,
+                  "padding": 32,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Q1B0s",
+                      "name": "Right Header",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "vUVE2",
+                          "name": "rightMacIcon",
+                          "width": 24,
+                          "height": 24,
+                          "iconFontName": "monitor",
+                          "iconFontFamily": "lucide",
+                          "fill": "#22C55E"
+                        },
+                        {
+                          "type": "icon_font",
+                          "id": "7TJFl",
+                          "name": "rightArrow",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "arrow-right",
+                          "iconFontFamily": "lucide",
+                          "fill": "#B0B0B0"
+                        },
+                        {
+                          "type": "icon_font",
+                          "id": "0XC5z",
+                          "name": "rightPhoneIcon",
+                          "width": 24,
+                          "height": 24,
+                          "iconFontName": "smartphone",
+                          "iconFontFamily": "lucide",
+                          "fill": "#0D0D0D"
+                        },
+                        {
+                          "type": "text",
+                          "id": "63xBA",
+                          "name": "rightTitle",
+                          "fill": "#0D0D0D",
+                          "content": "Mac → Android",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 18,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "wT0lz",
+                      "name": "rightDesc",
+                      "fill": "#7A7A7A",
+                      "content": "Mac 复制文字后，两种方式发送",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "fXLri",
+                      "name": "Right Way 1 - Shortcut",
+                      "width": "fill_container",
+                      "fill": "#FAFAFA",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": [
+                        16,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "HvQno",
+                          "name": "rWay1Title",
+                          "fill": "#0D0D0D",
+                          "content": "快捷键 Cmd+Shift+C",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Em8jX",
+                          "name": "rWay1Desc",
+                          "fill": "#7A7A7A",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "键盘党最爱，一键发送当前剪贴板到手机。",
+                          "lineHeight": 1.6,
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "taDlr",
+                      "name": "Right Way 2 - MenuBar",
+                      "width": "fill_container",
+                      "fill": "#FAFAFA",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": [
+                        16,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "rCv5O",
+                          "name": "rWay2Title",
+                          "fill": "#0D0D0D",
+                          "content": "Menu Bar → 发送剪贴板到 Android",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "SpN8X",
+                          "name": "rWay2Desc",
+                          "fill": "#7A7A7A",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "点击菜单栏图标，从下拉菜单中选择发送。鼠标操作，简单直观。",
+                          "lineHeight": 1.6,
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "bdqy5",
+                      "name": "rightResult",
+                      "fill": "#22C55E",
+                      "content": "手机收到通知 → 点击即可粘贴使用",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "qYovs",
+          "name": "Philosophy Section",
+          "width": "fill_container",
+          "fill": "#FFFFFF",
+          "layout": "vertical",
+          "gap": 48,
+          "padding": [
+            80,
+            360
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "kEEaN",
+              "name": "Phil Title",
+              "fill": "#0D0D0D",
+              "content": "只同步你想同步的",
+              "textAlign": "center",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 32,
+              "fontWeight": "600",
+              "letterSpacing": -0.5
+            },
+            {
+              "type": "text",
+              "id": "K0XwX",
+              "name": "philSubtitle",
+              "fill": "#7A7A7A",
+              "content": "不是做不到全自动，而是故意这样设计",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "gba7Y",
+              "name": "Phil Cards",
+              "width": "fill_container",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "5mGMV",
+                  "name": "Privacy Card",
+                  "width": "fill_container",
+                  "fill": "#FAFAFA",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 28,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "9v2kG",
+                      "name": "pIcon1",
+                      "width": 32,
+                      "height": 32,
+                      "iconFontName": "shield",
+                      "iconFontFamily": "lucide",
+                      "fill": "#22C55E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ce4In",
+                      "name": "pTitle1",
+                      "fill": "#0D0D0D",
+                      "content": "隐私",
+                      "textAlign": "center",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "NiV83",
+                      "name": "pDesc1",
+                      "fill": "#7A7A7A",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "密码、聊天记录不会被无差别搬运，只有你主动触发的内容才会同步",
+                      "lineHeight": 1.6,
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "VaVW0",
+                  "name": "Battery Card",
+                  "width": "fill_container",
+                  "fill": "#FAFAFA",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 28,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "KLmu6",
+                      "name": "pIcon2",
+                      "width": 32,
+                      "height": 32,
+                      "iconFontName": "battery-full",
+                      "iconFontFamily": "lucide",
+                      "fill": "#22C55E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "wzRmg",
+                      "name": "pTitle2",
+                      "fill": "#0D0D0D",
+                      "content": "省电",
+                      "textAlign": "center",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "i9qwW",
+                      "name": "pDesc2",
+                      "fill": "#7A7A7A",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "不在后台持续监听剪贴板，不会偷偷耗电耗流量",
+                      "lineHeight": 1.6,
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "qq2gz",
+                  "name": "Precise Card",
+                  "width": "fill_container",
+                  "fill": "#FAFAFA",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 28,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "z2dqm",
+                      "name": "pIcon3",
+                      "width": 32,
+                      "height": 32,
+                      "iconFontName": "target",
+                      "iconFontFamily": "lucide",
+                      "fill": "#22C55E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "PWQcE",
+                      "name": "pTitle3",
+                      "fill": "#0D0D0D",
+                      "content": "精准",
+                      "textAlign": "center",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "2MUfx",
+                      "name": "pDesc3",
+                      "fill": "#7A7A7A",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "你决定什么时候同步、同步什么内容，一次点击就是你的同步指令",
+                      "lineHeight": 1.6,
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "OVM30",
+          "name": "Quick Start Section",
+          "width": "fill_container",
+          "fill": "#FAFAFA",
+          "layout": "vertical",
+          "gap": 48,
+          "padding": [
+            80,
+            360
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "SlWNB",
+              "name": "Start Title",
+              "fill": "#0D0D0D",
+              "content": "30 秒上手",
+              "textAlign": "center",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 32,
+              "fontWeight": "600",
+              "letterSpacing": -0.5
+            },
+            {
+              "type": "frame",
+              "id": "uCVfI",
+              "name": "Steps",
+              "width": "fill_container",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "gXhB7",
+                  "name": "step1",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 24,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "HZFJQ",
+                      "name": "step1Num",
+                      "fill": "#22C55E",
+                      "content": "1",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "fszhM",
+                      "name": "step1Text",
+                      "fill": "#0D0D0D",
+                      "content": "Mac 安装 GhostClip",
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "nIXSW",
+                  "name": "step2",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 24,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Jcjm6",
+                      "name": "step2Num",
+                      "fill": "#22C55E",
+                      "content": "2",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "g8ji7",
+                      "name": "step2Text",
+                      "fill": "#0D0D0D",
+                      "content": "Android 安装 APK",
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "BUaaM",
+                  "name": "step3",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 24,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "DVLXH",
+                      "name": "step3Num",
+                      "fill": "#22C55E",
+                      "content": "3",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "r9DtQ",
+                      "name": "step3Text",
+                      "fill": "#0D0D0D",
+                      "content": "同一 WiFi 扫码配对",
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "fiAS6",
+                  "name": "step4",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 24,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "XQfYs",
+                      "name": "step4Num",
+                      "fill": "#22C55E",
+                      "content": "4",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "xkOQd",
+                      "name": "step4Text",
+                      "fill": "#0D0D0D",
+                      "content": "开始同步！",
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "zvguc",
+              "name": "permTitle",
+              "fill": "#0D0D0D",
+              "content": "建议开启的权限",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 18,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "4Z95x",
+              "name": "Permissions Table",
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E8E8E8"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "PkdIR",
+                  "name": "permRow1",
+                  "width": "fill_container",
+                  "stroke": {
+                    "thickness": {
+                      "bottom": 1
+                    },
+                    "fill": "#E8E8E8"
+                  },
+                  "gap": 16,
+                  "padding": [
+                    16,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "WxqKM",
+                      "name": "permIcon1",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "camera",
+                      "iconFontFamily": "lucide",
+                      "fill": "#22C55E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "lYPxa",
+                      "name": "permName1",
+                      "fill": "#0D0D0D",
+                      "textGrowth": "fixed-width",
+                      "width": 60,
+                      "content": "相机",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "gGkof",
+                      "name": "permVal1",
+                      "fill": "#0D0D0D",
+                      "content": "使用时允许",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "pwQxJ",
+                      "name": "permNote1",
+                      "fill": "#7A7A7A",
+                      "content": "仅扫码配对时使用",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "D5X5D",
+                  "name": "permRow2",
+                  "width": "fill_container",
+                  "stroke": {
+                    "thickness": {
+                      "bottom": 1
+                    },
+                    "fill": "#E8E8E8"
+                  },
+                  "gap": 16,
+                  "padding": [
+                    16,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "9O2kc",
+                      "name": "permIcon2",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "clipboard",
+                      "iconFontFamily": "lucide",
+                      "fill": "#22C55E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ttcmq",
+                      "name": "permName2",
+                      "fill": "#0D0D0D",
+                      "textGrowth": "fixed-width",
+                      "width": 60,
+                      "content": "剪贴板",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zsmmX",
+                      "name": "permVal2",
+                      "fill": "#0D0D0D",
+                      "content": "始终允许",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "7G9uo",
+                      "name": "permNote2",
+                      "fill": "#7A7A7A",
+                      "content": "接收同步内容需要写入剪贴板",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "gehVM",
+                  "name": "permRow3",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "padding": [
+                    16,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "ntwhR",
+                      "name": "permIcon3",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "bell",
+                      "iconFontFamily": "lucide",
+                      "fill": "#22C55E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "VMDJa",
+                      "name": "permName3",
+                      "fill": "#0D0D0D",
+                      "textGrowth": "fixed-width",
+                      "width": 60,
+                      "content": "通知",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "pTBco",
+                      "name": "permVal3",
+                      "fill": "#0D0D0D",
+                      "content": "开启",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "pJGW5",
+                      "name": "permNote3",
+                      "fill": "#7A7A7A",
+                      "content": "查看 Mac 下发的内容",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "9y1cB",
+          "name": "Download Section",
+          "width": "fill_container",
+          "fill": "#FFFFFF",
+          "layout": "vertical",
+          "gap": 40,
+          "padding": [
+            80,
+            360
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "KEDpG",
+              "name": "dlTitle",
+              "fill": "#0D0D0D",
+              "content": "现在就试试",
+              "textAlign": "center",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 32,
+              "fontWeight": "600",
+              "letterSpacing": -0.5
+            },
+            {
+              "type": "frame",
+              "id": "IOHBR",
+              "name": "Download Columns",
+              "width": "fill_container",
+              "gap": 32,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "9PoUh",
+                  "name": "Mac Download",
+                  "width": "fill_container",
+                  "fill": "#FAFAFA",
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 28,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "PkL38",
+                      "name": "dlMacIcon",
+                      "width": 32,
+                      "height": 32,
+                      "iconFontName": "monitor",
+                      "iconFontFamily": "lucide",
+                      "fill": "#0D0D0D"
+                    },
+                    {
+                      "type": "text",
+                      "id": "EO38E",
+                      "name": "dlMacTitle",
+                      "fill": "#0D0D0D",
+                      "content": "Mac",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 20,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "enVi0",
+                      "name": "dlMacCode",
+                      "width": "fill_container",
+                      "fill": "#0D0D0D",
+                      "padding": [
+                        12,
+                        16
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "0HPEw",
+                          "name": "dlMacCodeText",
+                          "fill": "#22C55E",
+                          "content": "brew install --cask xkcoding/tap/ghostclip",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "cwhkx",
+                      "name": "dlMacAlt",
+                      "fill": "#7A7A7A",
+                      "content": "或下载 DMG 手动安装",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Br2Yg",
+                  "name": "Android Download",
+                  "width": "fill_container",
+                  "fill": "#FAFAFA",
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 28,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "jhHtq",
+                      "name": "dlAndroidIcon",
+                      "width": 32,
+                      "height": 32,
+                      "iconFontName": "smartphone",
+                      "iconFontFamily": "lucide",
+                      "fill": "#0D0D0D"
+                    },
+                    {
+                      "type": "text",
+                      "id": "8Xpnk",
+                      "name": "dlAndroidTitle",
+                      "fill": "#0D0D0D",
+                      "content": "Android",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 20,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "YMKUb",
+                      "name": "dlAndroidBtn",
+                      "width": "fill_container",
+                      "fill": "#22C55E",
+                      "gap": 8,
+                      "padding": [
+                        14,
+                        24
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "Zlzgd",
+                          "name": "dlAndroidBtnIcon",
+                          "width": 16,
+                          "height": 16,
+                          "iconFontName": "download",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FFFFFF"
+                        },
+                        {
+                          "type": "text",
+                          "id": "fXvJY",
+                          "name": "dlAndroidBtnText",
+                          "fill": "#FFFFFF",
+                          "content": "下载 APK",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 15,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "i0r7O",
+                      "name": "dlAndroidNote",
+                      "fill": "#7A7A7A",
+                      "content": "从 GitHub Releases 下载",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "XQ1Ox",
+          "name": "Footer",
+          "width": "fill_container",
+          "fill": "#0D0D0D",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            40,
+            360
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "lNfCZ",
+              "name": "footerTop",
+              "gap": 24,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "kXKKX",
+                  "name": "footerLogo",
+                  "width": 28,
+                  "height": 28,
+                  "fill": "#22C55E",
+                  "cornerRadius": 6,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "fMtoq",
+                      "name": "footerLogoIcon",
+                      "width": 14,
+                      "height": 14,
+                      "iconFontName": "ghost",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFF"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "OGVuD",
+                  "name": "footerName",
+                  "fill": "#FFFFFF",
+                  "content": "GhostClip",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "0fyl3",
+                  "name": "footerDivider",
+                  "fill": "#333333",
+                  "width": 1,
+                  "height": 16
+                },
+                {
+                  "type": "text",
+                  "id": "Kx2ok",
+                  "name": "footerGithub",
+                  "fill": "#7A7A7A",
+                  "content": "GitHub",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "NxE2p",
+                  "name": "footerLicense",
+                  "fill": "#7A7A7A",
+                  "content": "MIT License",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "Qt3qe",
+              "name": "footerCopy",
+              "fill": "#555555",
+              "content": "开源项目，由社区驱动",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "m": "pencil:shadcn.lib.pen"
+  }
+}
