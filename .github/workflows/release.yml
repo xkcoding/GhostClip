@@ -20,6 +20,8 @@ jobs:
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-apple-darwin
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -45,18 +47,18 @@ jobs:
         run: cargo test -- --test-threads=1
 
       - name: Clean stale bundle cache
-        run: rm -rf mac/src-tauri/target/release/bundle
+        run: rm -rf mac/src-tauri/target/universal-apple-darwin/release/bundle
 
-      - name: Build Tauri app
+      - name: Build Tauri app (universal binary)
         working-directory: mac
         env:
           TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
-        run: cargo tauri build
+        run: cargo tauri build --target universal-apple-darwin
 
       - name: Find DMG
         id: find_dmg
         run: |
-          DMG=$(ls mac/src-tauri/target/release/bundle/dmg/*.dmg)
+          DMG=$(ls mac/src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg)
           echo "path=$DMG" >> "$GITHUB_OUTPUT"
           echo "name=$(basename $DMG)" >> "$GITHUB_OUTPUT"
 
