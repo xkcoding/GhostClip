@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.1] - 2026-03-12
+
+### Fixed
+
+- **Mac 通知弹窗修复**: 首次接收 Android 剪贴板时不再弹出 "Choose Application" 对话框
+  - 原因：mac-notification-sys 默认以 Finder 身份发通知，点击按钮时 macOS 不知道该激活哪个应用
+  - 修复：通知发送前绑定 GhostClip 的 bundle identifier (com.xkcoding.ghostclip)
+- **Mac 安装安全弹窗**: Homebrew 安装后不再弹出 macOS Gatekeeper 安全警告
+  - Cask 配置新增 postflight 自动移除 quarantine 隔离标记
+- **Mac 托盘图标偏小**: Menu Bar 图标放大约 14%，视觉更清晰
+
+### Improved
+
+- **Mac 多芯片支持**: DMG 改为 Universal Binary，同时支持 Apple Silicon (M1/M2/M3) 和 Intel Mac
+- **README 完善**: 新增产品截图、三层架构图、安装说明、使用方式等章节
+- **项目规范化**: 添加 MIT LICENSE、Landing Page 截图预览组件
+
 ## [0.1.0] - 2026-03-12
 
 GhostClip 首个正式版本。实现 Android <-> Mac 跨设备剪贴板同步。

@@ -419,7 +419,9 @@ fn generate_device_id() -> String {
 fn send_notification(_app: &tauri::AppHandle, text: &str) {
     let text_owned = text.to_string();
     std::thread::spawn(move || {
-        use mac_notification_sys::{Notification, MainButton, NotificationResponse};
+        use mac_notification_sys::{Notification, MainButton, NotificationResponse, set_application};
+        // 绑定 GhostClip bundle id，避免以 Finder 身份发通知导致 Choose Application 弹窗
+        let _ = set_application("com.xkcoding.ghostclip");
         let preview = truncate_str(&text_owned, 100);
         let result = Notification::new()
             .title("来自 Android 的剪贴板已同步")
