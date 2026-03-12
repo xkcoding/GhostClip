@@ -2,10 +2,10 @@
 import LucideIcon from './LucideIcon.astro';
 
 const steps = [
-  { num: '1', text: 'Mac 安装 GhostClip' },
-  { num: '2', text: 'Android 安装 APK' },
-  { num: '3', text: '同一 WiFi 扫码配对' },
-  { num: '4', text: '开始同步！' },
+  { num: '1', text: 'Mac 安装并打开 GhostClip', hint: '应用在屏幕顶部菜单栏（Menu Bar）中运行，不会出现独立窗口' },
+  { num: '2', text: 'Android 安装 APK', hint: '' },
+  { num: '3', text: '同一 WiFi 扫码配对', hint: '' },
+  { num: '4', text: '开始同步！', hint: '' },
 ];
 
 const permissions = [
@@ -23,6 +23,7 @@ const permissions = [
         <div class="step">
           <div class="step-num">{step.num}</div>
           <p>{step.text}</p>
+          {step.hint && <span class="step-hint">{step.hint}</span>}
         </div>
       ))}
     </div>
@@ -68,6 +69,11 @@ const permissions = [
   .step p {
     font-size: 14px;
     font-weight: 500;
+  }
+  .step-hint {
+    font-size: 12px;
+    color: #7A7A7A;
+    line-height: 1.4;
   }
   .permissions {
     max-width: 600px;
