@@ -2,10 +2,10 @@
 import LucideIcon from './LucideIcon.astro';
 
 const steps = [
-  { num: '1', text: 'Mac 安装并打开 GhostClip', hint: '应用在屏幕顶部菜单栏（Menu Bar）中运行，不会出现独立窗口' },
-  { num: '2', text: 'Android 安装 APK', hint: '' },
-  { num: '3', text: '同一 WiFi 扫码配对', hint: '' },
-  { num: '4', text: '开始同步！', hint: '' },
+  { num: '1', text: 'Mac 安装并打开 GhostClip' },
+  { num: '2', text: 'Android 安装 APK' },
+  { num: '3', text: '同一 WiFi 扫码配对' },
+  { num: '4', text: '开始同步！' },
 ];
 
 const permissions = [
@@ -23,9 +23,12 @@ const permissions = [
         <div class="step">
           <div class="step-num">{step.num}</div>
           <p>{step.text}</p>
-          {step.hint && <span class="step-hint">{step.hint}</span>}
         </div>
       ))}
+    </div>
+    <div class="tip fade-in">
+      <LucideIcon name="monitor" size={20} color="#15803d" />
+      <p>Mac 端打开后<strong>没有独立窗口</strong>，请留意屏幕顶部菜单栏（Menu Bar）中的 GhostClip 图标，点击即可操作。</p>
     </div>
     <div class="permissions fade-in">
       <h3 class="perm-title">建议开启的权限</h3>
@@ -70,10 +73,25 @@ const permissions = [
     font-size: 14px;
     font-weight: 500;
   }
-  .step-hint {
-    font-size: 12px;
-    color: #7A7A7A;
-    line-height: 1.4;
+  .tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 560px;
+    margin: 0 auto 40px;
+    padding: 16px 20px;
+    background: #f0fdf4;
+    border-left: 4px solid #22C55E;
+    border-radius: 0 8px 8px 0;
+  }
+  .tip p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #15803d;
+    margin: 0;
+  }
+  .tip strong {
+    font-weight: 600;
   }
   .permissions {
     max-width: 600px;
