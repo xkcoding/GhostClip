@@ -1,0 +1,65 @@
+<section class="section preview-section">
+  <div class="container center">
+    <h2 class="section-title fade-in">界面预览</h2>
+    <div class="preview-row fade-in">
+      <div class="preview-item">
+        <img src="/screenshots/android-main.webp" alt="Android 主界面" class="preview-img preview-img--phone" loading="lazy" />
+        <span class="preview-label">Android</span>
+      </div>
+      <div class="preview-item">
+        <img src="/screenshots/mac-menubar.webp" alt="Mac Menu Bar" class="preview-img preview-img--mac" loading="lazy" />
+        <span class="preview-label">Mac</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .preview-section {
+    padding: 64px 0;
+  }
+  .preview-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 64px;
+    margin-top: 16px;
+  }
+  .preview-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .preview-label {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 500;
+    color: #9CA3AF;
+    letter-spacing: 0.5px;
+  }
+  .preview-img {
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  .preview-img--phone {
+    width: 220px;
+  }
+  .preview-img--mac {
+    width: 280px;
+  }
+
+  @media (max-width: 768px) {
+    .preview-row {
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+    .preview-img--phone {
+      width: 200px;
+    }
+    .preview-img--mac {
+      width: 260px;
+    }
+  }
+</style>
